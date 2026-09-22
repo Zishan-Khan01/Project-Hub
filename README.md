@@ -1,75 +1,123 @@
-# React + TypeScript + Vite
+# Project Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A multi-tenant project management and ticket collaboration platform inspired by tools like Jira and Asana.
 
-Currently, two official plugins are available:
+Project Hub allows organizations to manage users, teams, projects, tasks, and task discussions from a centralized workspace.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Multi-tenant organization architecture
+- JWT-based authentication
+- HTTP-only authentication cookies
+- Role-based access control
+- User management
+- Team management
+- Project management
+- Task management
+- Kanban board with drag-and-drop
+- Task status and priority management
+- Task assignment
+- Task comments
+- Protected frontend routes
+- Tenant isolation
+- Request validation with Zod
+- CSRF protection
+- Rate limiting
+- Helmet security headers
+- Centralized error handling
+- Audit logging
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## User Roles
 
-## Expanding the ESLint configuration
+### Admin
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Manage users
+- Manage teams
+- Manage projects
+- Manage tasks
+- Manage organization resources
+- Manage user roles
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Project Manager
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Manage projects
+- Manage project members
+- Manage tasks
+- Assign tasks
+- Manage task status and priority
+- Manage comments
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Developer
 
-```
+- View assigned projects and tasks
+- Update task status
+- Work with assigned tasks
+- Add and manage own task comments
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Tech Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Frontend
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- React
+- TypeScript
+- React Router
+- Tailwind CSS
+- dnd-kit
+- Lucide React
+- Vite
 
-```
+### Backend
+
+- Node.js
+- Express
+- TypeScript
+- JWT
+- bcrypt
+- Zod
+- Helmet
+- CSRF protection
+- Express Rate Limit
+
+### Database
+
+- PostgreSQL
+- Prisma ORM
+
+### Development Tools
+
+- Git
+- GitHub
+- npm
+- curl
+
+## Project Structure
+
+
+Project Hub/
+├── client/
+│   ├── src/
+│   │   ├── api/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── pages/
+│   │   ├── routes/
+│   │   └── types/
+│   └── package.json
+│
+├── server/
+│   ├── migrations/
+│   ├── prisma/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── lib/
+│   │   ├── middleware/
+│   │   ├── routes/
+│   │   ├── schemas/
+│   │   ├── types/
+│   │   └── utils/
+│   └── package.json
+│
+├── .env.example
+├── .gitignore
+└── README.md
