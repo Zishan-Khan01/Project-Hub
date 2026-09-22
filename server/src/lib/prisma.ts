@@ -1,15 +1,17 @@
-import "dotenv/config";
-
 import { Temporal } from "@js-temporal/polyfill";
 
-globalThis.Temporal = Temporal;
+(globalThis as typeof globalThis & {
+  Temporal: typeof Temporal;
+}).Temporal = Temporal;
 
 import postgres from "@prisma/orm-postgres/runtime";
 
 import type { Contract } from "../../prisma/contract.d";
-import contractJson from "../../prisma/contract.json" with { type: "json" };
+import contractJson from "../../prisma/contract.json";
+
+import { env } from "../config/env.js";
 
 export const db = postgres<Contract>({
   contractJson,
-  url: process.env.DATABASE_URL!,
+  url: env.DATABASE_URL,
 });

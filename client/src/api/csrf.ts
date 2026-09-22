@@ -1,6 +1,8 @@
+import { API_URL } from "./apiClient";
+
 export async function getCsrfToken() {
   const response = await fetch(
-    "http://localhost:3000/api/auth/csrf-token",
+    `${API_URL}/auth/csrf-token`,
     {
       credentials: "include",
     }

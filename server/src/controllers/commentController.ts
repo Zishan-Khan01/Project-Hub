@@ -123,7 +123,7 @@ export async function getCommentsByTask(
       });
     }
 
-    const { taskId } = req.params;
+    const taskId = req.params.taskId as string;
 
     if (!uuidSchema.safeParse(taskId).success) {
       return res.status(404).json({
@@ -185,7 +185,7 @@ export async function getCommentById(
       });
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     if (!uuidSchema.safeParse(id).success) {
       return res.status(404).json({
@@ -256,7 +256,7 @@ export async function updateComment(
       });
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     if (!uuidSchema.safeParse(id).success) {
       return res.status(404).json({
@@ -313,17 +313,22 @@ export async function updateComment(
 
     const updatedComment = await db.orm.public.Comment
       .where({
-        id: comment.id,
-      })
+      id: comment.id,
+    })
       .update({
         content: parsed.data.content,
       });
 
+    if (!updatedComment) {
+      return res.status(404).json({
+        error: "Comment not found",
+      });
+    }
+        
     const commentWithUser = await addCommentUser(
       updatedComment,
       req.organizationId
     );
-
     await writeAuditLog({
       organizationId: req.organizationId,
       userId: req.userId,
@@ -364,7 +369,7 @@ export async function deleteComment(
       });
     }
 
-    const { id } = req.params;
+    const id = req.params.id as string;
 
     if (!uuidSchema.safeParse(id).success) {
       return res.status(404).json({

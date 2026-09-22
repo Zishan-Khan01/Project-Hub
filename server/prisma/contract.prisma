@@ -60,6 +60,7 @@ model User {
 
   comments Comment[]
   auditLogs AuditLog[]
+  @@index([organizationId])
 }
 
 model Team {

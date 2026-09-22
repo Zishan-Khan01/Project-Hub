@@ -77,12 +77,11 @@ export async function register(
 
     const token = createAccessToken(user.id);
 
-    res.cookie("accessToken", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    res.cookie(
+      "accessToken",
+      token,
+      accessTokenCookieOptions
+    );
 
     return res.status(201).json({
       message: "Registration successful",

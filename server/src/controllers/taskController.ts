@@ -1,14 +1,14 @@
 import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
+
+import { Temporal } from "@js-temporal/polyfill";
+
 import { db } from "../lib/prisma.js";
 import {
   createTaskSchema,
   updateTaskSchema,
 } from "../schemas/taskSchema.js";
-
-import { Temporal } from "@js-temporal/polyfill";
 import { writeAuditLog } from "../utils/audit.js";
-
 
 const uuidSchema = z.string().uuid();
 
@@ -99,6 +99,7 @@ export async function createTask(
       },
       req,
     });
+
     return res.status(201).json({
       message: "Task created successfully",
       task,
@@ -120,7 +121,6 @@ export async function getTasks(
       });
     }
 
-    // Get projects belonging to this organization first.
     const projects = await db.orm.public.Project
       .where({
         organizationId: req.organizationId,
@@ -129,7 +129,6 @@ export async function getTasks(
 
     const tasks = [];
 
-    // Get tasks belonging to those projects.
     for (const project of projects) {
       const projectTasks = await db.orm.public.Task
         .where({
@@ -154,7 +153,9 @@ export async function getTaskById(
   next: NextFunction
 ) {
   try {
-    if (!uuidSchema.safeParse(req.params.id).success) {
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
       return res.status(404).json({
         error: "Task not found",
       });
@@ -167,7 +168,7 @@ export async function getTaskById(
     }
 
     const task = await db.orm.public.Task.first({
-      id: req.params.id,
+      id,
     });
 
     if (!task) {
@@ -176,7 +177,6 @@ export async function getTaskById(
       });
     }
 
-    // Verify that the task's project belongs to this organization.
     const project = await db.orm.public.Project.first({
       id: task.projectId,
       organizationId: req.organizationId,
@@ -213,8 +213,17 @@ export async function updateTask(
         error: "Authentication required",
       });
     }
+
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Task not found",
+      });
+    }
+
     const task = await db.orm.public.Task.first({
-      id: req.params.id,
+      id,
     });
 
     if (!task) {
@@ -223,8 +232,6 @@ export async function updateTask(
       });
     }
 
-    // Verify that the task belongs to a project
-    // in the current organization.
     const project = await db.orm.public.Project.first({
       id: task.projectId,
       organizationId: req.organizationId,
@@ -253,10 +260,19 @@ export async function updateTask(
       });
     }
 
-    
     const previousStatus = task.status;
     const previousAssigneeId = task.assigneeId;
+
     if (data.assigneeId !== undefined) {
+      if (
+        typeof data.assigneeId !== "string" ||
+        !uuidSchema.safeParse(data.assigneeId).success
+      ) {
+        return res.status(400).json({
+          error: "assigneeId must be a valid UUID",
+        });
+      }
+
       const assignee = await db.orm.public.User.first({
         id: data.assigneeId,
         organizationId: req.organizationId,
@@ -282,6 +298,12 @@ export async function updateTask(
         id: task.id,
       })
       .update(updateData);
+
+    if (!updatedTask) {
+      return res.status(404).json({
+        error: "Task not found",
+      });
+    }
 
     await writeAuditLog({
       organizationId: req.organizationId,
@@ -330,6 +352,7 @@ export async function updateTask(
         req,
       });
     }
+
     return res.status(200).json({
       message: "Task updated successfully",
       task: updatedTask,
@@ -356,8 +379,17 @@ export async function deleteTask(
         error: "Authentication required",
       });
     }
+
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Task not found",
+      });
+    }
+
     const task = await db.orm.public.Task.first({
-      id: req.params.id,
+      id,
     });
 
     if (!task) {
@@ -366,8 +398,6 @@ export async function deleteTask(
       });
     }
 
-    // Verify that the task belongs to a project
-    // in the current organization.
     const project = await db.orm.public.Project.first({
       id: task.projectId,
       organizationId: req.organizationId,

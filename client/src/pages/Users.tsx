@@ -450,9 +450,9 @@ export default function Users() {
 
                           {/* Created */}
                           <td className="px-6 py-4 text-sm text-gray-500">
-                            {new Date(
-                              user.createdAt
-                            ).toLocaleDateString()}
+                            {user.createdAt
+			      ? new Date(user.createdAt).toLocaleDateString()
+			      : "—"}
                           </td>
 
                           {/* Actions */}

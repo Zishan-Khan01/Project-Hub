@@ -1,5 +1,16 @@
 import type { Request } from "express";
+
 import { db } from "../lib/prisma.js";
+
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | {
+      [key: string]: JsonValue;
+    };
 
 type AuditLogInput = {
   organizationId: string;
@@ -7,7 +18,7 @@ type AuditLogInput = {
   action: string;
   resource: string;
   resourceId?: string;
-  metadata?: Record<string, unknown>;
+  metadata?: JsonValue;
   req?: Request;
 };
 
@@ -30,4 +41,4 @@ export async function writeAuditLog({
     ipAddress: req?.ip,
     userAgent: req?.get("user-agent"),
   });
-}	
+}

@@ -89,7 +89,7 @@ export default function Kanban() {
         setError("");
 
         const data =
-          await getTasks(projectId);
+          await getTasks();
 
         setTasks(data);
       } catch (error) {
@@ -228,21 +228,18 @@ export default function Kanban() {
 
             description:
               editDescription.trim() ||
-              null,
+              undefined,
 
             status: editStatus,
 
             priority: editPriority,
 
             dueDate:
-              editDueDate || null,
-
-            projectId:
-              editingTask.projectId,
+              editDueDate || undefined,
 
             assigneeId:
               editingTask.assigneeId ??
-              null,
+              undefined,
           }
         );
 

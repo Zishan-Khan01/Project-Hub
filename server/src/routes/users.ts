@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { requireRole } from "../middleware/rbac.js";
+
 import {
   getCurrentUser,
   getUsers,
@@ -13,18 +14,6 @@ import {
 const router = Router();
 
 router.get("/me", getCurrentUser);
-
-router.get(
-  "/admin-test",
-  requireRole("ADMIN"),
-  (req, res) => {
-    res.json({
-      message: "Admin access granted",
-      userId: req.userId,
-      organizationId: req.organizationId,
-    });
-  }
-);
 
 router.get("/", getUsers);
 

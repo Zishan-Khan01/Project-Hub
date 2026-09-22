@@ -13,6 +13,9 @@ import {
   registerUser,
 } from "../api/authApi";
 
+import { getCsrfToken } from "../api/csrf";
+import { setCsrfToken } from "../api/apiClient";
+
 import type {
   LoginRequest,
   RegisterRequest,
@@ -55,6 +58,11 @@ export function AuthProvider({
   useEffect(() => {
     async function restoreSession() {
       try {
+        const { csrfToken } =
+          await getCsrfToken();
+
+        setCsrfToken(csrfToken);
+
         const currentUser =
           await getCurrentUser();
 
@@ -70,7 +78,8 @@ export function AuthProvider({
   }, []);
 
   async function login(data: LoginRequest) {
-    const response = await loginUser(data);
+    const response =
+      await loginUser(data);
 
     setUser(response.user);
   }

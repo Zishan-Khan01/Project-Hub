@@ -1,7 +1,6 @@
 import {
   Menu,
   LogOut,
-  X,
 } from "lucide-react";
 
 import { useEffect, useState } from "react";

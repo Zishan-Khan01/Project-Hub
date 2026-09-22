@@ -1,4 +1,8 @@
-import type { Request, Response, NextFunction } from "express";
+import type {
+  Request,
+  Response,
+  NextFunction,
+} from "express";
 
 import { db } from "../lib/prisma.js";
 
@@ -15,8 +19,15 @@ export function requireRole(...allowedRoles: string[]) {
         });
       }
 
+      if (!req.organizationId) {
+        return res.status(401).json({
+          error: "Organization context missing",
+        });
+      }
+
       const user = await db.orm.public.User.first({
         id: req.userId,
+        organizationId: req.organizationId,
       });
 
       if (!user) {

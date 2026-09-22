@@ -663,7 +663,7 @@ export default function Teams() {
 
                             <div
                               key={
-                                member.membershipId
+                                member.id
                               }
                               className="flex items-center justify-between rounded-lg border p-3"
                             >

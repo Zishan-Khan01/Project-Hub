@@ -4,34 +4,14 @@ import type {
   TeamMember,
 } from "../types/team";
 
-const API_URL = "http://localhost:3000/api";
-
-async function handleResponse<T>(
-  response: Response
-): Promise<T> {
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      data.error || "Something went wrong"
-    );
-  }
-
-  return data;
-}
+import { apiRequest } from "./apiClient";
 
 export async function getTeams(): Promise<Team[]> {
-  const response = await fetch(
-    `${API_URL}/teams`,
-    {
-      method: "GET",
-      credentials: "include",
-    }
-  );
-
-  const data = await handleResponse<{
+  const data = await apiRequest<{
     teams: Team[];
-  }>(response);
+  }>("/teams", {
+    method: "GET",
+  });
 
   return data.teams;
 }
@@ -39,21 +19,16 @@ export async function getTeams(): Promise<Team[]> {
 export async function createTeam(
   data: CreateTeamRequest
 ): Promise<Team> {
-  const response = await fetch(
-    `${API_URL}/teams`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify(data),
-    }
-  );
-
-  const result = await handleResponse<{
+  const result = await apiRequest<{
+    message: string;
     team: Team;
-  }>(response);
+  }>("/teams", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
   return result.team;
 }
@@ -61,35 +36,23 @@ export async function createTeam(
 export async function deleteTeam(
   teamId: string
 ): Promise<void> {
-  const response = await fetch(
-    `${API_URL}/teams/${teamId}`,
-    {
-      method: "DELETE",
-      credentials: "include",
-    }
-  );
-
-  await handleResponse(response);
+  await apiRequest(`/teams/${teamId}`, {
+    method: "DELETE",
+  });
 }
 
 export async function getTeamMembers(
   teamId: string
 ): Promise<TeamMember[]> {
-  const response = await fetch(
-    `${API_URL}/teams/${teamId}/members`,
-    {
-      method: "GET",
-      credentials: "include",
-    }
-  );
-
-  const data = await handleResponse<{
+  const data = await apiRequest<{
     team: {
       id: string;
       name: string;
     };
     members: TeamMember[];
-  }>(response);
+  }>(`/teams/${teamId}/members`, {
+    method: "GET",
+  });
 
   return data.members;
 }
@@ -98,58 +61,33 @@ export async function addTeamMember(
   teamId: string,
   userId: string
 ): Promise<TeamMember> {
-  const response = await fetch(
-    `${API_URL}/teams/${teamId}/members`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        userId,
-      }),
-    }
-  );
-
-  const data = await handleResponse<{
+  const data = await apiRequest<{
     message: string;
-    member: {
-      id: string;
-      teamId: string;
-      userId: string;
-      joinedAt: string;
-    };
-  }>(response);
+    member: TeamMember;
+  }>(`/teams/${teamId}/members`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userId,
+    }),
+  });
 
-  /*
-   * The backend does not return the user's
-   * details here, so we return only the
-   * membership data.
-   *
-   * The Teams page will reload the members
-   * after adding.
-   */
-  return data.member as TeamMember;
+  return data.member;
 }
 
 export async function removeTeamMember(
   teamId: string,
   userId: string
 ): Promise<void> {
-  const response = await fetch(
-    `${API_URL}/teams/${teamId}/members`,
-    {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({
-        userId,
-      }),
-    }
-  );
-
-  await handleResponse(response);
+  await apiRequest(`/teams/${teamId}/members`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userId,
+    }),
+  });
 }

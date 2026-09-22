@@ -1,4 +1,8 @@
-import type { Request, Response, NextFunction } from "express";
+import type {
+  Request,
+  Response,
+  NextFunction,
+} from "express";
 
 import { db } from "../lib/prisma.js";
 
@@ -24,7 +28,17 @@ export async function requireTenant(
       });
     }
 
-    req.organizationId = user.organizationId;
+    const organization = await db.orm.public.Organization.first({
+      id: user.organizationId,
+    });
+
+    if (!organization) {
+      return res.status(401).json({
+        error: "Organization not found",
+      });
+    }
+
+    req.organizationId = organization.id;
 
     next();
   } catch (error) {

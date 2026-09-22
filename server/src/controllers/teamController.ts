@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
 
 import { db } from "../lib/prisma.js";
@@ -5,8 +6,9 @@ import {
   createTeamSchema,
   updateTeamSchema,
 } from "../schemas/teamSchema.js";
-
 import { writeAuditLog } from "../utils/audit.js";
+
+const uuidSchema = z.string().uuid();
 
 export async function createTeam(
   req: Request,
@@ -63,7 +65,6 @@ export async function createTeam(
   }
 }
 
-
 export async function getTeams(
   req: Request,
   res: Response,
@@ -90,7 +91,6 @@ export async function getTeams(
   }
 }
 
-
 export async function getTeamById(
   req: Request,
   res: Response,
@@ -103,8 +103,16 @@ export async function getTeamById(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Team not found",
+      });
+    }
+
     const team = await db.orm.public.Team.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -122,7 +130,6 @@ export async function getTeamById(
   }
 }
 
-
 export async function updateTeam(
   req: Request,
   res: Response,
@@ -135,8 +142,16 @@ export async function updateTeam(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Team not found",
+      });
+    }
+
     const team = await db.orm.public.Team.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -167,6 +182,12 @@ export async function updateTeam(
       })
       .update(parsed.data);
 
+    if (!updatedTeam) {
+      return res.status(404).json({
+        error: "Team not found",
+      });
+    }
+
     await writeAuditLog({
       organizationId: req.organizationId,
       userId: req.userId,
@@ -188,7 +209,6 @@ export async function updateTeam(
   }
 }
 
-
 export async function deleteTeam(
   req: Request,
   res: Response,
@@ -201,8 +221,16 @@ export async function deleteTeam(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Team not found",
+      });
+    }
+
     const team = await db.orm.public.Team.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -229,6 +257,7 @@ export async function deleteTeam(
       },
       req,
     });
+
     return res.status(200).json({
       message: "Team deleted successfully",
     });
@@ -236,7 +265,6 @@ export async function deleteTeam(
     next(error);
   }
 }
-
 
 export async function addTeamMember(
   req: Request,
@@ -250,8 +278,16 @@ export async function addTeamMember(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Team not found",
+      });
+    }
+
     const team = await db.orm.public.Team.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -263,9 +299,12 @@ export async function addTeamMember(
 
     const { userId } = req.body;
 
-    if (!userId || typeof userId !== "string") {
+    if (
+      typeof userId !== "string" ||
+      !uuidSchema.safeParse(userId).success
+    ) {
       return res.status(400).json({
-        error: "userId is required",
+        error: "userId must be a valid UUID",
       });
     }
 
@@ -317,7 +356,6 @@ export async function addTeamMember(
   }
 }
 
-
 export async function getTeamMembers(
   req: Request,
   res: Response,
@@ -330,8 +368,16 @@ export async function getTeamMembers(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Team not found",
+      });
+    }
+
     const team = await db.orm.public.Team.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -381,7 +427,6 @@ export async function getTeamMembers(
   }
 }
 
-
 export async function removeTeamMember(
   req: Request,
   res: Response,
@@ -394,8 +439,16 @@ export async function removeTeamMember(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Team not found",
+      });
+    }
+
     const team = await db.orm.public.Team.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -407,9 +460,12 @@ export async function removeTeamMember(
 
     const { userId } = req.body;
 
-    if (!userId || typeof userId !== "string") {
+    if (
+      typeof userId !== "string" ||
+      !uuidSchema.safeParse(userId).success
+    ) {
       return res.status(400).json({
-        error: "userId is required",
+        error: "userId must be a valid UUID",
       });
     }
 

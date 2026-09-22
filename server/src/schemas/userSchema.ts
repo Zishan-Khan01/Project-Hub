@@ -43,4 +43,5 @@ export const updateUserSchema =
         "DEVELOPER",
       ])
       .optional(),
+    password: z.string().min(8).max(100).optional(),
   });

@@ -1,4 +1,12 @@
-const API_URL = "http://localhost:3000/api";
+export const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:3000/api";
+
+let csrfToken: string | null = null;
+
+export function setCsrfToken(token: string) {
+  csrfToken = token;
+}
 
 export class ApiError extends Error {
   status: number;
@@ -16,13 +24,18 @@ export class ApiError extends Error {
   }
 }
 
+interface ApiErrorResponse {
+  error?: string;
+  details?: unknown;
+}
+
 export async function handleResponse<T>(
   response: Response
 ): Promise<T> {
-  let data: any = null;
+  let data: ApiErrorResponse | null = null;
 
   try {
-    data = await response.json();
+    data = (await response.json()) as ApiErrorResponse;
   } catch {
     data = null;
   }
@@ -38,7 +51,8 @@ export async function handleResponse<T>(
 
     if (response.status === 403) {
       throw new ApiError(
-        data?.error || "You do not have permission to perform this action",
+        data?.error ||
+          "You do not have permission to perform this action",
         403,
         data?.details
       );
@@ -46,7 +60,8 @@ export async function handleResponse<T>(
 
     if (response.status === 404) {
       throw new ApiError(
-        data?.error || "The requested resource was not found",
+        data?.error ||
+          "The requested resource was not found",
         404,
         data?.details
       );
@@ -62,14 +77,16 @@ export async function handleResponse<T>(
 
     if (response.status >= 500) {
       throw new ApiError(
-        data?.error || "Server error. Please try again later.",
+        data?.error ||
+          "Server error. Please try again later.",
         response.status,
         data?.details
       );
     }
 
     throw new ApiError(
-      data?.error || "Something went wrong. Please try again.",
+      data?.error ||
+        "Something went wrong. Please try again.",
       response.status,
       data?.details
     );
@@ -84,11 +101,33 @@ export async function apiRequest<T>(
 ): Promise<T> {
   let response: Response;
 
+  const method = (
+    options.method || "GET"
+  ).toUpperCase();
+
+  const headers = new Headers(options.headers);
+
+  if (
+    ["POST", "PUT", "PATCH", "DELETE"].includes(
+      method
+    ) &&
+    csrfToken
+  ) {
+    headers.set(
+      "x-csrf-token",
+      csrfToken
+    );
+  }
+
   try {
-    response = await fetch(`${API_URL}${path}`, {
-      ...options,
-      credentials: "include",
-    });
+    response = await fetch(
+      `${API_URL}${path}`,
+      {
+        ...options,
+        headers,
+        credentials: "include",
+      }
+    );
   } catch {
     throw new ApiError(
       "Unable to connect to the server. Please check your connection and try again.",
@@ -98,5 +137,3 @@ export async function apiRequest<T>(
 
   return handleResponse<T>(response);
 }
-
-export { API_URL };

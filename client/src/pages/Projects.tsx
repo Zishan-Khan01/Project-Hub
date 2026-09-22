@@ -495,8 +495,11 @@ function DescriptionPreview({
 
     function checkOverflow() {
       setIsOverflowing(
-        element.scrollHeight >
-          element.clientHeight
+	Boolean(
+          element &&
+	  element.scrollHeight >
+            element.clientHeight
+	)
       );
     }
 

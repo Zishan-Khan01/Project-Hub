@@ -30,7 +30,7 @@ app.use(securityHeaders);
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CLIENT_URL || "http://localhost:5173",
     credentials: true,
   })
 );
@@ -40,7 +40,7 @@ app.use(express.json({ limit: "100kb" }));
 app.use(cookieParser());
 
 // General API rate limiting
-//app.use("/api", apiRateLimiter);
+app.use("/api", apiRateLimiter);
 
 // Health check
 app.get("/api/health", (_req, res) => {
@@ -68,6 +68,7 @@ app.use(
   "/api/users",
   requireAuth,
   requireTenant,
+  doubleCsrfProtection,
   userRoutes
 );
 
@@ -75,6 +76,7 @@ app.use(
   "/api/teams",
   requireAuth,
   requireTenant,
+  doubleCsrfProtection,
   teamRoutes
 );
 
@@ -82,6 +84,7 @@ app.use(
   "/api/projects",
   requireAuth,
   requireTenant,
+  doubleCsrfProtection,
   projectRoutes
 );
 
@@ -89,6 +92,7 @@ app.use(
   "/api/tasks",
   requireAuth,
   requireTenant,
+  doubleCsrfProtection,
   taskRoutes
 );
 
@@ -96,6 +100,7 @@ app.use(
   "/api/comments",
   requireAuth,
   requireTenant,
+  doubleCsrfProtection,
   commentRoutes
 );
 

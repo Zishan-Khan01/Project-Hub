@@ -1,12 +1,12 @@
 import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
+
 import { db } from "../lib/prisma.js";
 import {
   createProjectSchema,
   updateProjectSchema,
 } from "../schemas/projectSchema.js";
 import { writeAuditLog } from "../utils/audit.js";
-
 
 const uuidSchema = z.string().uuid();
 
@@ -39,8 +39,6 @@ export async function createProject(
 
     const { name, description, teamId } = parsed.data;
 
-    // If a team was supplied, make sure it belongs
-    // to the current user's organization.
     if (teamId) {
       const team = await db.orm.public.Team.first({
         id: teamId,
@@ -73,6 +71,7 @@ export async function createProject(
       },
       req,
     });
+
     return res.status(201).json({
       message: "Project created successfully",
       project,
@@ -113,8 +112,10 @@ export async function getProjectById(
   res: Response,
   next: NextFunction
 ) {
+  const id = req.params.id as string;
+
   try {
-    if (!uuidSchema.safeParse(req.params.id).success) {
+    if (!uuidSchema.safeParse(id).success) {
       return res.status(404).json({
         error: "Project not found",
       });
@@ -127,7 +128,7 @@ export async function getProjectById(
     }
 
     const project = await db.orm.public.Project.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -157,8 +158,16 @@ export async function updateProject(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Project not found",
+      });
+    }
+
     const project = await db.orm.public.Project.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -185,10 +194,8 @@ export async function updateProject(
       });
     }
 
-    // If teamId is being changed, verify the new team
-    // belongs to the same organization.
     if (data.teamId !== undefined) {
-      if (data.teamId === "") {
+      if (!uuidSchema.safeParse(data.teamId).success) {
         return res.status(400).json({
           error: "teamId must be a valid UUID",
         });
@@ -211,6 +218,12 @@ export async function updateProject(
         id: project.id,
       })
       .update(data);
+
+    if (!updatedProject) {
+      return res.status(404).json({
+        error: "Project not found",
+      });
+    }
 
     await writeAuditLog({
       organizationId: req.organizationId,
@@ -245,8 +258,16 @@ export async function deleteProject(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Project not found",
+      });
+    }
+
     const project = await db.orm.public.Project.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -294,8 +315,16 @@ export async function addProjectMember(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Project not found",
+      });
+    }
+
     const project = await db.orm.public.Project.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -307,9 +336,12 @@ export async function addProjectMember(
 
     const { userId } = req.body;
 
-    if (!userId || typeof userId !== "string") {
+    if (
+      typeof userId !== "string" ||
+      !uuidSchema.safeParse(userId).success
+    ) {
       return res.status(400).json({
-        error: "userId is required",
+        error: "userId must be a valid UUID",
       });
     }
 
@@ -373,8 +405,16 @@ export async function getProjectMembers(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Project not found",
+      });
+    }
+
     const project = await db.orm.public.Project.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -439,8 +479,16 @@ export async function removeProjectMember(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "Project not found",
+      });
+    }
+
     const project = await db.orm.public.Project.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -452,9 +500,12 @@ export async function removeProjectMember(
 
     const { userId } = req.body;
 
-    if (!userId || typeof userId !== "string") {
+    if (
+      typeof userId !== "string" ||
+      !uuidSchema.safeParse(userId).success
+    ) {
       return res.status(400).json({
-        error: "userId is required",
+        error: "userId must be a valid UUID",
       });
     }
 
@@ -486,6 +537,7 @@ export async function removeProjectMember(
       },
       req,
     });
+
     return res.status(200).json({
       message: "Project member removed successfully",
     });

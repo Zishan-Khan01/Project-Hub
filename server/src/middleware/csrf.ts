@@ -1,9 +1,10 @@
 import { doubleCsrf } from "csrf-csrf";
 
-const isProduction = process.env.NODE_ENV === "production";
+import { env } from "../config/env.js";
 
-const csrfSecret =
-  process.env.CSRF_SECRET || "development-csrf-secret-change-me";
+const isProduction = env.isProduction;
+
+const csrfSecret = env.CSRF_SECRET;
 
 export const {
   generateCsrfToken,

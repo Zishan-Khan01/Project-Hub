@@ -1,15 +1,16 @@
+import { z } from "zod";
 import type { Request, Response, NextFunction } from "express";
 
 import { db } from "../lib/prisma.js";
-
 import {
   createUserSchema,
   updateUserSchema,
 } from "../schemas/userSchema.js";
 
 import { hashPassword } from "../lib/auth.js";
-
 import { writeAuditLog } from "../utils/audit.js";
+
+const uuidSchema = z.string().uuid();
 
 export async function getCurrentUser(
   req: Request,
@@ -17,7 +18,7 @@ export async function getCurrentUser(
   next: NextFunction
 ) {
   try {
-    if (!req.userId) {
+    if (!req.userId || !req.organizationId) {
       return res.status(401).json({
         error: "Authentication required",
       });
@@ -25,6 +26,7 @@ export async function getCurrentUser(
 
     const user = await db.orm.public.User.first({
       id: req.userId,
+      organizationId: req.organizationId,
     });
 
     if (!user) {
@@ -61,9 +63,11 @@ export async function getUsers(
       });
     }
 
-    const users = await db.orm.public.User.where({
-      organizationId: req.organizationId,
-    }).all();
+    const users = await db.orm.public.User
+      .where({
+        organizationId: req.organizationId,
+      })
+      .all();
 
     return res.status(200).json({
       users: users.map((user) => ({
@@ -93,8 +97,16 @@ export async function getUserById(
       });
     }
 
+    const id = req.params.id as string;
+
+    if (!uuidSchema.safeParse(id).success) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
+
     const user = await db.orm.public.User.first({
-      id: req.params.id,
+      id,
       organizationId: req.organizationId,
     });
 
@@ -150,11 +162,12 @@ export async function createUser(
 
     const existingUser = await db.orm.public.User.first({
       email,
+      organizationId: req.organizationId,
     });
 
     if (existingUser) {
       return res.status(409).json({
-        error: "Email is already registered",
+        error: "User with this email already exists",
       });
     }
 
@@ -175,10 +188,11 @@ export async function createUser(
       resource: "User",
       resourceId: user.id,
       metadata: {
+        email: user.email,
         role: user.role,
       },
       req,
-   });
+    });
 
     return res.status(201).json({
       message: "User created successfully",
@@ -203,43 +217,30 @@ export async function updateUser(
   next: NextFunction
 ) {
   try {
+    if (!req.organizationId) {
+      return res.status(401).json({
+        error: "Organization context missing",
+      });
+    }
+
     if (!req.userId) {
       return res.status(401).json({
         error: "Authentication required",
       });
     }
 
-    if (!req.organizationId) {
-      return res.status(400).json({
-        error: "Organization context missing",
+    const targetUserId = req.params.id as string;
+
+    if (!uuidSchema.safeParse(targetUserId).success) {
+      return res.status(404).json({
+        error: "User not found",
       });
     }
 
-    const targetUserId = req.params.id;
-
-    if (!targetUserId) {
-      return res.status(400).json({
-        error: "User ID is required",
-      });
-    }
-
-    const result = updateUserSchema.safeParse(
-      req.body
-    );
-
-    if (!result.success) {
-      return res.status(400).json({
-        error: "Invalid user data",
-        details: result.error.flatten(),
-      });
-    }
-
-    const data = result.data;
-
-    const targetUser =
-      await db.orm.public.User.first({
-        id: targetUserId,
-      });
+    const targetUser = await db.orm.public.User.first({
+      id: targetUserId,
+      organizationId: req.organizationId,
+    });
 
     if (!targetUser) {
       return res.status(404).json({
@@ -247,83 +248,83 @@ export async function updateUser(
       });
     }
 
-    /*
-     * Tenant isolation
-     */
-    if (
-      targetUser.organizationId !==
-      req.organizationId
-    ) {
-      return res.status(404).json({
-        error: "User not found",
+    const parsed = updateUserSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: "Invalid request data",
+        details: parsed.error.flatten(),
       });
     }
 
-    /*
-     * A user cannot change their own role.
-     *
-     * They can still change their own
-     * name/email if the requester is an Admin.
-     */
+    if (Object.keys(parsed.data).length === 0) {
+      return res.status(400).json({
+        error: "No fields provided for update",
+      });
+    }
+
     if (
-      targetUserId === req.userId &&
-      data.role !== undefined
+      targetUser.id === req.userId &&
+      parsed.data.role !== undefined &&
+      parsed.data.role !== targetUser.role
     ) {
       return res.status(403).json({
         error: "You cannot change your own role",
       });
     }
 
-    /*
-     * Prevent the last Admin from being
-     * demoted.
-     */
-    if (
-      targetUser.role === "ADMIN" &&
-      data.role !== undefined &&
-      data.role !== "ADMIN"
-    ) {
-      const organizationUsers =
-        await db.orm.public.User.where({
-          organizationId:
-            req.organizationId,
-        }).all();
+    const updateData: {
+      name?: string;
+      email?: string;
+      passwordHash?: string;
+      role?: typeof targetUser.role;
+    } = {};
 
-      const adminCount =
-        organizationUsers.filter(
-          (user) => user.role === "ADMIN"
-        ).length;
+    if (parsed.data.name !== undefined) {
+      updateData.name = parsed.data.name;
+    }
 
-      if (adminCount <= 1) {
-        return res.status(400).json({
-          error:
-            "The last Admin cannot be demoted",
+    if (parsed.data.email !== undefined) {
+      updateData.email = parsed.data.email;
+    }
+
+    if (parsed.data.role !== undefined) {
+      updateData.role = parsed.data.role;
+    }
+
+    if (parsed.data.email !== undefined) {
+      const existingUser = await db.orm.public.User.first({
+        email: parsed.data.email,
+        organizationId: req.organizationId,
+      });
+
+      if (
+        existingUser &&
+        existingUser.id !== targetUser.id
+      ) {
+        return res.status(409).json({
+          error: "User with this email already exists",
         });
       }
     }
 
-    const updateData: Record<
-      string,
-      unknown
-    > = {};
-
-    if (data.name !== undefined) {
-      updateData.name = data.name;
+    if (parsed.data.password !== undefined) {
+      updateData.passwordHash = await hashPassword(
+        parsed.data.password
+      );
     }
 
-    if (data.email !== undefined) {
-      updateData.email =
-        data.email.toLowerCase();
-    }
-
-    if (data.role !== undefined) {
-      updateData.role = data.role;
-    }
-
-    const updatedUser =
-      await db.orm.public.User.where({
+    const updatedUser = await db.orm.public.User
+      .where({
         id: targetUserId,
-      }).update(updateData);
+      })
+      .update(updateData);
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        error: "User not found",
+      });
+    }
 
     await writeAuditLog({
       organizationId: req.organizationId,
@@ -332,14 +333,14 @@ export async function updateUser(
       resource: "User",
       resourceId: updatedUser.id,
       metadata: {
-        fields: Object.keys(updateData),
+        fields: Object.keys(parsed.data),
       },
       req,
     });
 
     if (
-      data.role !== undefined &&
-      data.role !== targetUser.role
+      parsed.data.role !== undefined &&
+      parsed.data.role !== targetUser.role
     ) {
       await writeAuditLog({
         organizationId: req.organizationId,
@@ -349,20 +350,20 @@ export async function updateUser(
         resourceId: updatedUser.id,
         metadata: {
           previousRole: targetUser.role,
-        newRole: updatedUser.role,
-      },
-      req,
-    });
-  }
+          newRole: updatedUser.role,
+        },
+        req,
+      });
+    }
 
     return res.status(200).json({
+      message: "User updated successfully",
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
         email: updatedUser.email,
         role: updatedUser.role,
-        organizationId:
-          updatedUser.organizationId,
+        organizationId: updatedUser.organizationId,
         createdAt: updatedUser.createdAt,
         updatedAt: updatedUser.updatedAt,
       },
@@ -378,39 +379,36 @@ export async function deleteUser(
   next: NextFunction
 ) {
   try {
+    if (!req.organizationId) {
+      return res.status(401).json({
+        error: "Organization context missing",
+      });
+    }
+
     if (!req.userId) {
       return res.status(401).json({
         error: "Authentication required",
       });
     }
 
-    if (!req.organizationId) {
-      return res.status(400).json({
-        error: "Organization context missing",
+    const targetUserId = req.params.id as string;
+
+    if (!uuidSchema.safeParse(targetUserId).success) {
+      return res.status(404).json({
+        error: "User not found",
       });
     }
 
-    const targetUserId = req.params.id;
-
-    if (!targetUserId) {
-      return res.status(400).json({
-        error: "User ID is required",
-      });
-    }
-
-    /*
-     * User cannot delete themselves.
-     */
     if (targetUserId === req.userId) {
-      return res.status(403).json({
+      return res.status(400).json({
         error: "You cannot delete your own account",
       });
     }
 
-    const targetUser =
-      await db.orm.public.User.first({
-        id: targetUserId,
-      });
+    const targetUser = await db.orm.public.User.first({
+      id: targetUserId,
+      organizationId: req.organizationId,
+    });
 
     if (!targetUser) {
       return res.status(404).json({
@@ -418,40 +416,11 @@ export async function deleteUser(
       });
     }
 
-    /*
-     * Tenant isolation
-     */
-    if (
-      targetUser.organizationId !==
-      req.organizationId
-    ) {
-      return res.status(404).json({
-        error: "User not found",
-      });
-    }
-
-    /*
-     * Prevent deletion of the last Admin.
-     */
-    if (targetUser.role === "ADMIN") {
-      const organizationUsers =
-        await db.orm.public.User.where({
-          organizationId:
-            req.organizationId,
-        }).all();
-
-      const adminCount =
-        organizationUsers.filter(
-          (user) => user.role === "ADMIN"
-        ).length;
-
-      if (adminCount <= 1) {
-        return res.status(400).json({
-          error:
-            "The last Admin cannot be deleted",
-        });
-      }
-    }
+    await db.orm.public.User
+      .where({
+        id: targetUser.id,
+      })
+      .delete();
 
     await writeAuditLog({
       organizationId: req.organizationId,
@@ -460,17 +429,11 @@ export async function deleteUser(
       resource: "User",
       resourceId: targetUser.id,
       metadata: {
+        email: targetUser.email,
         role: targetUser.role,
       },
       req,
     });
-    /*
-     * Verify the user still belongs to the
-     * current organization before deleting.
-     */
-    await db.orm.public.User.where({
-      id: targetUserId,
-    }).delete();
 
     return res.status(200).json({
       message: "User deleted successfully",
