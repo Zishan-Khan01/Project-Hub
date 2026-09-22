@@ -1,0 +1,1630 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.comment",
+    "label": "Create table \"comment\"",
+    "summary": "Creates table \"comment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "comment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"comment\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"comment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"comment\"",
+        "sql": "CREATE TABLE \"public\".\"comment\" (\n  \"content\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"taskId\" uuid NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  \"userId\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"comment\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"comment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.organization",
+    "label": "Create table \"organization\"",
+    "summary": "Creates table \"organization\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "organization"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"organization\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"organization\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"organization\"",
+        "sql": "CREATE TABLE \"public\".\"organization\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"name\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"organization\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"organization\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.project",
+    "label": "Create table \"project\"",
+    "summary": "Creates table \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"project\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"project\"",
+        "sql": "CREATE TABLE \"public\".\"project\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"createdById\" uuid NOT NULL,\n  \"description\" text,\n  \"id\" uuid NOT NULL,\n  \"name\" text NOT NULL,\n  \"organizationId\" uuid NOT NULL,\n  \"teamId\" uuid,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"project\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.projectMember",
+    "label": "Create table \"projectMember\"",
+    "summary": "Creates table \"projectMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "projectMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"projectMember\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"projectMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"projectMember\"",
+        "sql": "CREATE TABLE \"public\".\"projectMember\" (\n  \"id\" uuid NOT NULL,\n  \"joinedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"userId\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"projectMember\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"projectMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.task",
+    "label": "Create table \"task\"",
+    "summary": "Creates table \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"task\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"task\"",
+        "sql": "CREATE TABLE \"public\".\"task\" (\n  \"assigneeId\" uuid,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"createdById\" uuid NOT NULL,\n  \"description\" text,\n  \"dueDate\" timestamptz,\n  \"id\" uuid NOT NULL,\n  \"priority\" text DEFAULT 'MEDIUM' NOT NULL,\n  \"projectId\" uuid NOT NULL,\n  \"status\" text DEFAULT 'TODO' NOT NULL,\n  \"title\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"task_priority_check_8918b779\" CHECK (\"priority\" IN ('LOW', 'MEDIUM', 'HIGH', 'URGENT')),\n  CONSTRAINT \"task_status_check_217ccf21\" CHECK (\"status\" IN ('TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"task\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.team",
+    "label": "Create table \"team\"",
+    "summary": "Creates table \"team\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "team"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"team\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"team\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"team\"",
+        "sql": "CREATE TABLE \"public\".\"team\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"name\" text NOT NULL,\n  \"organizationId\" uuid NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"team\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"team\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.teamMember",
+    "label": "Create table \"teamMember\"",
+    "summary": "Creates table \"teamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "teamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"teamMember\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teamMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"teamMember\"",
+        "sql": "CREATE TABLE \"public\".\"teamMember\" (\n  \"id\" uuid NOT NULL,\n  \"joinedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"teamId\" uuid NOT NULL,\n  \"userId\" uuid NOT NULL,\n  PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"teamMember\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teamMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.user",
+    "label": "Create table \"user\"",
+    "summary": "Creates table \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"user\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"user\"",
+        "sql": "CREATE TABLE \"public\".\"user\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"email\" text NOT NULL,\n  \"id\" uuid NOT NULL,\n  \"name\" text NOT NULL,\n  \"organizationId\" uuid NOT NULL,\n  \"passwordHash\" text NOT NULL,\n  \"role\" text DEFAULT 'DEVELOPER' NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"id\"),\n  CONSTRAINT \"user_role_check_382e71d4\" CHECK (\"role\" IN ('ADMIN', 'PROJECT_MANAGER', 'DEVELOPER'))\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"user\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.projectMember.projectMember_projectId_userId_key",
+    "label": "Add unique constraint on \"projectMember\" (projectId, userId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "projectMember_projectId_userId_key",
+        "table": "projectMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"projectMember_projectId_userId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "projectMember_projectId_userId_key",
+          "public",
+          "\"public\".\"projectMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"projectMember_projectId_userId_key\"",
+        "sql": "ALTER TABLE \"public\".\"projectMember\" ADD CONSTRAINT \"projectMember_projectId_userId_key\" UNIQUE (\"projectId\", \"userId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"projectMember_projectId_userId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "projectMember_projectId_userId_key",
+          "public",
+          "\"public\".\"projectMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.teamMember.teamMember_teamId_userId_key",
+    "label": "Add unique constraint on \"teamMember\" (teamId, userId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "teamMember_teamId_userId_key",
+        "table": "teamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"teamMember_teamId_userId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teamMember_teamId_userId_key",
+          "public",
+          "\"public\".\"teamMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"teamMember_teamId_userId_key\"",
+        "sql": "ALTER TABLE \"public\".\"teamMember\" ADD CONSTRAINT \"teamMember_teamId_userId_key\" UNIQUE (\"teamId\", \"userId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"teamMember_teamId_userId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teamMember_teamId_userId_key",
+          "public",
+          "\"public\".\"teamMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.user.user_email_key",
+    "label": "Add unique constraint on \"user\" (email)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "user_email_key",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"user_email_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_email_key",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"user_email_key\"",
+        "sql": "ALTER TABLE \"public\".\"user\" ADD CONSTRAINT \"user_email_key\" UNIQUE (\"email\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"user_email_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_email_key",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.comment.comment_taskId_idx_4965c936",
+    "label": "Create index \"comment_taskId_idx_4965c936\" on \"comment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "comment_taskId_idx_4965c936",
+        "table": "comment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"comment_taskId_idx_4965c936\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"comment_taskId_idx_4965c936\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"comment_taskId_idx_4965c936\"",
+        "sql": "CREATE INDEX \"comment_taskId_idx_4965c936\" ON \"public\".\"comment\" (\"taskId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"comment_taskId_idx_4965c936\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"comment_taskId_idx_4965c936\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.comment.comment_userId_idx_a489d58a",
+    "label": "Create index \"comment_userId_idx_a489d58a\" on \"comment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "comment_userId_idx_a489d58a",
+        "table": "comment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"comment_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"comment_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"comment_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"comment_userId_idx_a489d58a\" ON \"public\".\"comment\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"comment_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"comment_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.project.project_createdById_idx_8bf640ed",
+    "label": "Create index \"project_createdById_idx_8bf640ed\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "project_createdById_idx_8bf640ed",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"project_createdById_idx_8bf640ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_createdById_idx_8bf640ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"project_createdById_idx_8bf640ed\"",
+        "sql": "CREATE INDEX \"project_createdById_idx_8bf640ed\" ON \"public\".\"project\" (\"createdById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"project_createdById_idx_8bf640ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_createdById_idx_8bf640ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.project.project_organizationId_idx_2e17ef41",
+    "label": "Create index \"project_organizationId_idx_2e17ef41\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "project_organizationId_idx_2e17ef41",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"project_organizationId_idx_2e17ef41\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_organizationId_idx_2e17ef41\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"project_organizationId_idx_2e17ef41\"",
+        "sql": "CREATE INDEX \"project_organizationId_idx_2e17ef41\" ON \"public\".\"project\" (\"organizationId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"project_organizationId_idx_2e17ef41\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_organizationId_idx_2e17ef41\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.project.project_teamId_idx_f2b72ab3",
+    "label": "Create index \"project_teamId_idx_f2b72ab3\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "project_teamId_idx_f2b72ab3",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"project_teamId_idx_f2b72ab3\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_teamId_idx_f2b72ab3\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"project_teamId_idx_f2b72ab3\"",
+        "sql": "CREATE INDEX \"project_teamId_idx_f2b72ab3\" ON \"public\".\"project\" (\"teamId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"project_teamId_idx_f2b72ab3\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"project_teamId_idx_f2b72ab3\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.projectMember.projectMember_projectId_idx_a96e4d92",
+    "label": "Create index \"projectMember_projectId_idx_a96e4d92\" on \"projectMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "projectMember_projectId_idx_a96e4d92",
+        "table": "projectMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"projectMember_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"projectMember_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"projectMember_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"projectMember_projectId_idx_a96e4d92\" ON \"public\".\"projectMember\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"projectMember_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"projectMember_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.projectMember.projectMember_userId_idx_a489d58a",
+    "label": "Create index \"projectMember_userId_idx_a489d58a\" on \"projectMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "projectMember_userId_idx_a489d58a",
+        "table": "projectMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"projectMember_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"projectMember_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"projectMember_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"projectMember_userId_idx_a489d58a\" ON \"public\".\"projectMember\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"projectMember_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"projectMember_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.task.task_assigneeId_idx_fd12ae38",
+    "label": "Create index \"task_assigneeId_idx_fd12ae38\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "task_assigneeId_idx_fd12ae38",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"task_assigneeId_idx_fd12ae38\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task_assigneeId_idx_fd12ae38\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"task_assigneeId_idx_fd12ae38\"",
+        "sql": "CREATE INDEX \"task_assigneeId_idx_fd12ae38\" ON \"public\".\"task\" (\"assigneeId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"task_assigneeId_idx_fd12ae38\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task_assigneeId_idx_fd12ae38\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.task.task_createdById_idx_8bf640ed",
+    "label": "Create index \"task_createdById_idx_8bf640ed\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "task_createdById_idx_8bf640ed",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"task_createdById_idx_8bf640ed\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task_createdById_idx_8bf640ed\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"task_createdById_idx_8bf640ed\"",
+        "sql": "CREATE INDEX \"task_createdById_idx_8bf640ed\" ON \"public\".\"task\" (\"createdById\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"task_createdById_idx_8bf640ed\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task_createdById_idx_8bf640ed\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.task.task_projectId_idx_a96e4d92",
+    "label": "Create index \"task_projectId_idx_a96e4d92\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "task_projectId_idx_a96e4d92",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"task_projectId_idx_a96e4d92\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task_projectId_idx_a96e4d92\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"task_projectId_idx_a96e4d92\"",
+        "sql": "CREATE INDEX \"task_projectId_idx_a96e4d92\" ON \"public\".\"task\" (\"projectId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"task_projectId_idx_a96e4d92\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task_projectId_idx_a96e4d92\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.task.task_status_idx_e98638ab",
+    "label": "Create index \"task_status_idx_e98638ab\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "task_status_idx_e98638ab",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"task_status_idx_e98638ab\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task_status_idx_e98638ab\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"task_status_idx_e98638ab\"",
+        "sql": "CREATE INDEX \"task_status_idx_e98638ab\" ON \"public\".\"task\" (\"status\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"task_status_idx_e98638ab\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"task_status_idx_e98638ab\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.team.team_organizationId_idx_2e17ef41",
+    "label": "Create index \"team_organizationId_idx_2e17ef41\" on \"team\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "team_organizationId_idx_2e17ef41",
+        "table": "team"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"team_organizationId_idx_2e17ef41\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"team_organizationId_idx_2e17ef41\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"team_organizationId_idx_2e17ef41\"",
+        "sql": "CREATE INDEX \"team_organizationId_idx_2e17ef41\" ON \"public\".\"team\" (\"organizationId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"team_organizationId_idx_2e17ef41\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"team_organizationId_idx_2e17ef41\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.teamMember.teamMember_teamId_idx_f2b72ab3",
+    "label": "Create index \"teamMember_teamId_idx_f2b72ab3\" on \"teamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "teamMember_teamId_idx_f2b72ab3",
+        "table": "teamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"teamMember_teamId_idx_f2b72ab3\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teamMember_teamId_idx_f2b72ab3\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"teamMember_teamId_idx_f2b72ab3\"",
+        "sql": "CREATE INDEX \"teamMember_teamId_idx_f2b72ab3\" ON \"public\".\"teamMember\" (\"teamId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"teamMember_teamId_idx_f2b72ab3\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teamMember_teamId_idx_f2b72ab3\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.teamMember.teamMember_userId_idx_a489d58a",
+    "label": "Create index \"teamMember_userId_idx_a489d58a\" on \"teamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "teamMember_userId_idx_a489d58a",
+        "table": "teamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"teamMember_userId_idx_a489d58a\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teamMember_userId_idx_a489d58a\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"teamMember_userId_idx_a489d58a\"",
+        "sql": "CREATE INDEX \"teamMember_userId_idx_a489d58a\" ON \"public\".\"teamMember\" (\"userId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"teamMember_userId_idx_a489d58a\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"teamMember_userId_idx_a489d58a\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.user.user_organizationId_idx_2e17ef41",
+    "label": "Create index \"user_organizationId_idx_2e17ef41\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "user_organizationId_idx_2e17ef41",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"user_organizationId_idx_2e17ef41\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_organizationId_idx_2e17ef41\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"user_organizationId_idx_2e17ef41\"",
+        "sql": "CREATE INDEX \"user_organizationId_idx_2e17ef41\" ON \"public\".\"user\" (\"organizationId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"user_organizationId_idx_2e17ef41\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"user_organizationId_idx_2e17ef41\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.comment.comment_taskId_fkey",
+    "label": "Add foreign key \"comment_taskId_fkey\" on \"comment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "comment_taskId_fkey",
+        "table": "comment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"comment_taskId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "comment_taskId_fkey",
+          "public",
+          "\"public\".\"comment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"comment_taskId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"comment\"\nADD CONSTRAINT \"comment_taskId_fkey\"\nFOREIGN KEY (\"taskId\")\nREFERENCES \"public\".\"task\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"comment_taskId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "comment_taskId_fkey",
+          "public",
+          "\"public\".\"comment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.comment.comment_userId_fkey",
+    "label": "Add foreign key \"comment_userId_fkey\" on \"comment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "comment_userId_fkey",
+        "table": "comment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"comment_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "comment_userId_fkey",
+          "public",
+          "\"public\".\"comment\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"comment_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"comment\"\nADD CONSTRAINT \"comment_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"comment_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "comment_userId_fkey",
+          "public",
+          "\"public\".\"comment\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.project.project_organizationId_fkey",
+    "label": "Add foreign key \"project_organizationId_fkey\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "project_organizationId_fkey",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"project_organizationId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_organizationId_fkey",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"project_organizationId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"project\"\nADD CONSTRAINT \"project_organizationId_fkey\"\nFOREIGN KEY (\"organizationId\")\nREFERENCES \"public\".\"organization\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"project_organizationId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_organizationId_fkey",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.project.project_teamId_fkey",
+    "label": "Add foreign key \"project_teamId_fkey\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "project_teamId_fkey",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"project_teamId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_teamId_fkey",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"project_teamId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"project\"\nADD CONSTRAINT \"project_teamId_fkey\"\nFOREIGN KEY (\"teamId\")\nREFERENCES \"public\".\"team\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"project_teamId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_teamId_fkey",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.project.project_createdById_fkey",
+    "label": "Add foreign key \"project_createdById_fkey\" on \"project\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "project_createdById_fkey",
+        "table": "project"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"project_createdById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_createdById_fkey",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"project_createdById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"project\"\nADD CONSTRAINT \"project_createdById_fkey\"\nFOREIGN KEY (\"createdById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"project_createdById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "project_createdById_fkey",
+          "public",
+          "\"public\".\"project\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.projectMember.projectMember_projectId_fkey",
+    "label": "Add foreign key \"projectMember_projectId_fkey\" on \"projectMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "projectMember_projectId_fkey",
+        "table": "projectMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"projectMember_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "projectMember_projectId_fkey",
+          "public",
+          "\"public\".\"projectMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"projectMember_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"projectMember\"\nADD CONSTRAINT \"projectMember_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"projectMember_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "projectMember_projectId_fkey",
+          "public",
+          "\"public\".\"projectMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.projectMember.projectMember_userId_fkey",
+    "label": "Add foreign key \"projectMember_userId_fkey\" on \"projectMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "projectMember_userId_fkey",
+        "table": "projectMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"projectMember_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "projectMember_userId_fkey",
+          "public",
+          "\"public\".\"projectMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"projectMember_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"projectMember\"\nADD CONSTRAINT \"projectMember_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"projectMember_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "projectMember_userId_fkey",
+          "public",
+          "\"public\".\"projectMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.task.task_projectId_fkey",
+    "label": "Add foreign key \"task_projectId_fkey\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "task_projectId_fkey",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"task_projectId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_projectId_fkey",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"task_projectId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"task\"\nADD CONSTRAINT \"task_projectId_fkey\"\nFOREIGN KEY (\"projectId\")\nREFERENCES \"public\".\"project\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"task_projectId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_projectId_fkey",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.task.task_assigneeId_fkey",
+    "label": "Add foreign key \"task_assigneeId_fkey\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "task_assigneeId_fkey",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"task_assigneeId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_assigneeId_fkey",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"task_assigneeId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"task\"\nADD CONSTRAINT \"task_assigneeId_fkey\"\nFOREIGN KEY (\"assigneeId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE SET NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"task_assigneeId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_assigneeId_fkey",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.task.task_createdById_fkey",
+    "label": "Add foreign key \"task_createdById_fkey\" on \"task\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "task_createdById_fkey",
+        "table": "task"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"task_createdById_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_createdById_fkey",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"task_createdById_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"task\"\nADD CONSTRAINT \"task_createdById_fkey\"\nFOREIGN KEY (\"createdById\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE RESTRICT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"task_createdById_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "task_createdById_fkey",
+          "public",
+          "\"public\".\"task\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.team.team_organizationId_fkey",
+    "label": "Add foreign key \"team_organizationId_fkey\" on \"team\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "team_organizationId_fkey",
+        "table": "team"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"team_organizationId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "team_organizationId_fkey",
+          "public",
+          "\"public\".\"team\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"team_organizationId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"team\"\nADD CONSTRAINT \"team_organizationId_fkey\"\nFOREIGN KEY (\"organizationId\")\nREFERENCES \"public\".\"organization\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"team_organizationId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "team_organizationId_fkey",
+          "public",
+          "\"public\".\"team\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.teamMember.teamMember_teamId_fkey",
+    "label": "Add foreign key \"teamMember_teamId_fkey\" on \"teamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "teamMember_teamId_fkey",
+        "table": "teamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"teamMember_teamId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teamMember_teamId_fkey",
+          "public",
+          "\"public\".\"teamMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"teamMember_teamId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"teamMember\"\nADD CONSTRAINT \"teamMember_teamId_fkey\"\nFOREIGN KEY (\"teamId\")\nREFERENCES \"public\".\"team\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"teamMember_teamId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teamMember_teamId_fkey",
+          "public",
+          "\"public\".\"teamMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.teamMember.teamMember_userId_fkey",
+    "label": "Add foreign key \"teamMember_userId_fkey\" on \"teamMember\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "teamMember_userId_fkey",
+        "table": "teamMember"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"teamMember_userId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teamMember_userId_fkey",
+          "public",
+          "\"public\".\"teamMember\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"teamMember_userId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"teamMember\"\nADD CONSTRAINT \"teamMember_userId_fkey\"\nFOREIGN KEY (\"userId\")\nREFERENCES \"public\".\"user\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"teamMember_userId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "teamMember_userId_fkey",
+          "public",
+          "\"public\".\"teamMember\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.user.user_organizationId_fkey",
+    "label": "Add foreign key \"user_organizationId_fkey\" on \"user\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "user_organizationId_fkey",
+        "table": "user"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"user_organizationId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_organizationId_fkey",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"user_organizationId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"user\"\nADD CONSTRAINT \"user_organizationId_fkey\"\nFOREIGN KEY (\"organizationId\")\nREFERENCES \"public\".\"organization\" (\"id\")\nON DELETE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"user_organizationId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "user_organizationId_fkey",
+          "public",
+          "\"public\".\"user\""
+        ]
+      }
+    ]
+  }
+]
