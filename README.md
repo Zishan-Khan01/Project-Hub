@@ -6,7 +6,7 @@ A multi-tenant project management and ticket management platform inspired by too
 
 
 
-Project Hub allows organizations to manage teams, projects, tasks, comments, and user access through role-based permissions. The application is built as a full-stack TypeScript application and deployed on AWS using EC2 and RDS PostgreSQL.
+Project Hub allows organizations to manage teams, projects, tasks, comments, and user access through role-based permissions.
 
 
 
@@ -14,7 +14,11 @@ Project Hub allows organizations to manage teams, projects, tasks, comments, and
 
 
 
-Project Hub is designed around a multi-tenant architecture where users belong to organizations and access is isolated by organization.
+Project Hub is a full-stack project management platform built around a multi-tenant architecture.
+
+
+
+Users belong to organizations, and access to protected resources is isolated by organization.
 
 
 
@@ -32,21 +36,19 @@ The platform provides:
 
 \* Role-based access control
 
-\* Secure authentication using JWT and HTTP-only cookies
+\* JWT authentication
+
+\* HTTP-only authentication cookies
 
 \* CSRF protection
 
 \* Request validation
 
-\* Rate limiting and security headers
+\* Rate limiting
 
 \* PostgreSQL persistence
 
-\* AWS-based production deployment
-
-
-
-The project demonstrates full-stack application development, backend security, relational database design, and cloud deployment.
+\* AWS production deployment
 
 
 
@@ -78,9 +80,7 @@ The project demonstrates full-stack application development, backend security, r
 
 \* Organization-based user isolation
 
-\* Users belong to organizations
-
-\* Teams and projects are associated with organizations
+\* Teams and projects associated with organizations
 
 \* Protected resources enforce tenant isolation
 
@@ -94,15 +94,15 @@ Supported roles:
 
 
 
-\* \*\*Admin\*\*
+\* Admin
 
-\* \*\*Project Manager\*\*
+\* Project Manager
 
-\* \*\*Developer\*\*
+\* Developer
 
 
 
-Role-based middleware controls access to protected operations.
+Authorization is enforced on the backend.
 
 
 
@@ -126,7 +126,7 @@ Role-based middleware controls access to protected operations.
 
 \* Assign project members
 
-\* Associate projects with teams and organizations
+\* Associate projects with organizations
 
 
 
@@ -200,7 +200,7 @@ Supported priorities:
 
 \* Tenant isolation
 
-\* Request validation with Zod
+\* Zod request validation
 
 \* Rate limiting
 
@@ -208,7 +208,7 @@ Supported priorities:
 
 \* CORS configuration
 
-\* Production HTTPS
+\* HTTPS
 
 \* Private RDS database access
 
@@ -302,8 +302,6 @@ Supported priorities:
 
 \* npm
 
-\* Windows CMD / Linux shell
-
 
 
 \## 4. System Architecture
@@ -314,63 +312,65 @@ Supported priorities:
 
 &#x20;                        Internet
 
-&#x20;                            │
+&#x20;                            |
 
-&#x20;                            ▼
+&#x20;                            v
 
-&#x20;                   ┌─────────────────┐
+&#x20;                   +-----------------+
 
-&#x20;                   │      Nginx      │
+&#x20;                   |      Nginx      |
 
-&#x20;                   │   HTTP → HTTPS  │
+&#x20;                   |   HTTP -> HTTPS |
 
-&#x20;                   │      :80/:443   │
+&#x20;                   |     :80/:443    |
 
-&#x20;                   └────────┬────────┘
+&#x20;                   +--------+--------+
 
-&#x20;                            │
+&#x20;                            |
 
-&#x20;                            ▼
+&#x20;                            v
 
-&#x20;                   ┌─────────────────┐
+&#x20;                   +-----------------+
 
-&#x20;                   │  Node.js +      │
+&#x20;                   |   Node.js +     |
 
-&#x20;                   │    Express      │
+&#x20;                   |     Express     |
 
-&#x20;                   │    :3000        │
+&#x20;                   |      :3000      |
 
-&#x20;                   └────────┬────────┘
+&#x20;                   +--------+--------+
 
-&#x20;                            │
+&#x20;                            |
 
-&#x20;                            ▼
+&#x20;                            v
 
-&#x20;                   ┌─────────────────┐
+&#x20;                   +-----------------+
 
-&#x20;                   │ AWS RDS         │
+&#x20;                   |    AWS RDS      |
 
-&#x20;                   │ PostgreSQL      │
+&#x20;                   |   PostgreSQL    |
 
-&#x20;                   │     :5432       │
+&#x20;                   |      :5432      |
 
-&#x20;                   └─────────────────┘
+&#x20;                   +-----------------+
 
 
 
-&#x20;      AWS EC2
+AWS EC2
 
-&#x20;      ├── Nginx
+|
 
-&#x20;      ├── Express API
++-- Nginx
 
-&#x20;      └── React production build
++-- Express API
+
++-- React production build
 
 ```
 
 
 
-\### 5. Application Architecture
+\## 5. Application Architecture
 
 
 
@@ -378,47 +378,43 @@ Supported priorities:
 
 React Frontend
 
-&#x20;     │
+&#x20;     |
 
-&#x20;     │ HTTPS / REST API
+&#x20;     | HTTPS / REST API
 
-&#x20;     ▼
+&#x20;     v
 
 Express Backend
 
-&#x20;     │
+&#x20;     |
 
-&#x20;     ├── Authentication
+&#x20;     +-- Authentication
 
-&#x20;     ├── Authorization / RBAC
+&#x20;     +-- Authorization / RBAC
 
-&#x20;     ├── Tenant Isolation
+&#x20;     +-- Tenant Isolation
 
-&#x20;     ├── Validation
+&#x20;     +-- Validation
 
-&#x20;     ├── CSRF Protection
+&#x20;     +-- CSRF Protection
 
-&#x20;     ├── Rate Limiting
+&#x20;     +-- Rate Limiting
 
-&#x20;     └── Business Logic
+&#x20;     +-- Business Logic
 
-&#x20;            │
+&#x20;            |
 
-&#x20;            ▼
+&#x20;            v
 
-&#x20;      Prisma ORM
+&#x20;       Prisma ORM
 
-&#x20;            │
+&#x20;            |
 
-&#x20;            ▼
+&#x20;            v
 
-&#x20;     PostgreSQL / RDS
+&#x20;      PostgreSQL / RDS
 
 ```
-
-
-
-The application follows a layered architecture where the React frontend communicates with the Express backend through REST APIs. The backend handles authentication, authorization, validation, security middleware, and business logic before interacting with PostgreSQL through Prisma.
 
 
 
@@ -460,7 +456,7 @@ Role-based access control is implemented for:
 
 
 
-Protected routes verify both authentication and the user's permissions before allowing restricted operations.
+Protected routes verify authentication and permissions before allowing restricted operations.
 
 
 
@@ -476,7 +472,7 @@ Protected state-changing requests use CSRF protection through a CSRF token mecha
 
 
 
-Users and resources are associated with organizations. Protected backend operations verify organization membership to prevent users from accessing resources belonging to another organization.
+Users and resources are associated with organizations. Protected backend operations verify organization membership to prevent access to resources belonging to another organization.
 
 
 
@@ -510,15 +506,15 @@ Helmet is used to provide HTTP security headers.
 
 \* HTTPS through Nginx and Let's Encrypt
 
-\* HTTP → HTTPS redirection
+\* HTTP to HTTPS redirection
 
-\* Public access to Express port `3000` disabled
+\* Express port 3000 is not publicly exposed
 
 \* RDS PostgreSQL is not publicly accessible
 
 \* EC2 Security Groups restrict network access
 
-\* Secrets stored in environment variables
+\* Secrets are stored in environment variables
 
 
 
@@ -538,59 +534,59 @@ The core entity hierarchy is:
 
 Organization
 
-&#x20;   │
+&#x20;   |
 
-&#x20;   ├── Users
+&#x20;   +-- Users
 
-&#x20;   │
+&#x20;   |
 
-&#x20;   ├── Teams
+&#x20;   +-- Teams
 
-&#x20;   │      │
+&#x20;   |     |
 
-&#x20;   │      └── Team Members
+&#x20;   |     +-- Team Members
 
-&#x20;   │
+&#x20;   |
 
-&#x20;   └── Projects
+&#x20;   +-- Projects
 
-&#x20;          │
+&#x20;         |
 
-&#x20;          ├── Project Members
+&#x20;         +-- Project Members
 
-&#x20;          │
+&#x20;         |
 
-&#x20;          └── Tasks
+&#x20;         +-- Tasks
 
-&#x20;                 │
+&#x20;               |
 
-&#x20;                 └── Comments
+&#x20;               +-- Comments
 
 ```
 
 
 
-\### Core Entities
+Core entities include:
 
 
 
-\* \*\*Organization\*\* — tenant boundary for application data
+\* Organization
 
-\* \*\*User\*\* — application users and their roles
+\* User
 
-\* \*\*Team\*\* — groups of users within an organization
+\* Team
 
-\* \*\*TeamMember\*\* — team membership relationship
+\* TeamMember
 
-\* \*\*Project\*\* — projects belonging to an organization
+\* Project
 
-\* \*\*ProjectMember\*\* — project membership relationship
+\* ProjectMember
 
-\* \*\*Task\*\* — project work items/tickets
+\* Task
 
-\* \*\*Comment\*\* — task-related discussions
+\* Comment
 
-\* \*\*AuditLog\*\* — records important application actions
+\* AuditLog
 
 
 
@@ -602,27 +598,23 @@ Many-to-many relationships such as team membership and project membership are re
 
 
 
-Project Hub currently supports three user roles:
+Project Hub supports three user roles:
 
 
 
-| Role                | Description                               |
+| Role            | Description                               |
 
-| ------------------- | ----------------------------------------- |
+| --------------- | ----------------------------------------- |
 
-| \*\*Admin\*\*           | Organization-level administrative access  |
+| Admin           | Organization-level administrative access  |
 
-| \*\*Project Manager\*\* | Manages projects and project-related work |
+| Project Manager | Manages projects and project-related work |
 
-| \*\*Developer\*\*       | Works on assigned projects and tasks      |
+| Developer       | Works on assigned projects and tasks      |
 
 
 
 Authorization is enforced on the backend through RBAC middleware rather than relying only on frontend restrictions.
-
-
-
-This ensures that restricted operations cannot be accessed simply by bypassing the frontend.
 
 
 
@@ -652,107 +644,33 @@ The backend exposes REST API endpoints organized by resource:
 
 
 
-\### Authentication
+Authentication endpoints include:
 
 
 
 ```text
 
-POST   /api/auth/register
+POST /api/auth/register
 
-POST   /api/auth/login
+POST /api/auth/login
 
-POST   /api/auth/logout
+POST /api/auth/logout
 
-GET    /api/auth/csrf-token
-
-```
-
-
-
-\### Users
-
-
-
-```text
-
-GET    /api/users
-
-...
+GET  /api/auth/csrf-token
 
 ```
 
 
 
-\### Teams
+Protected resources require authentication and tenant authorization.
 
 
 
-```text
-
-GET    /api/teams
-
-POST   /api/teams
-
-...
-
-```
+The API uses standard HTTP methods and JSON responses.
 
 
 
-\### Projects
-
-
-
-```text
-
-GET    /api/projects
-
-POST   /api/projects
-
-...
-
-```
-
-
-
-\### Tasks
-
-
-
-```text
-
-GET    /api/tasks
-
-POST   /api/tasks
-
-...
-
-```
-
-
-
-\### Comments
-
-
-
-```text
-
-GET    /api/comments
-
-POST   /api/comments
-
-...
-
-```
-
-
-
-The API uses standard HTTP methods and JSON responses. Protected resources require authentication and tenant authorization.
-
-
-
-\## 10. Deployment
+\## 10. AWS Deployment
 
 
 
@@ -764,13 +682,13 @@ The application is deployed on AWS using a minimal production architecture.
 
 
 
-\* \*\*EC2\*\* — hosts Nginx, the Express backend, and the React production build
+\* EC2 hosts Nginx, the Express backend, and the React production build.
 
-\* \*\*RDS PostgreSQL\*\* — managed relational database
+\* RDS PostgreSQL provides managed relational database storage.
 
-\* \*\*Security Groups\*\* — control inbound and database access
+\* Security Groups control network access.
 
-\* \*\*IAM\*\* — AWS identity and access management
+\* IAM provides AWS identity and access management.
 
 
 
@@ -778,37 +696,29 @@ The application is deployed on AWS using a minimal production architecture.
 
 
 
-Nginx sits in front of the Express server:
-
-
-
 ```text
 
 Internet
 
-&#x20;  │
+&#x20;  |
 
-&#x20;  ▼
+&#x20;  v
 
 Nginx :443
 
-&#x20;  │
+&#x20;  |
 
-&#x20;  ▼
+&#x20;  v
 
 Express :3000
 
-&#x20;  │
+&#x20;  |
 
-&#x20;  ▼
+&#x20;  v
 
 RDS PostgreSQL :5432
 
 ```
-
-
-
-Express listens on the internal EC2 port while Nginx handles public HTTP/HTTPS traffic.
 
 
 
@@ -840,55 +750,57 @@ The Express application runs as a systemd service, allowing the backend to start
 
 Project Hub/
 
-│
+|
 
-├── client/
++-- client/
 
-│   ├── src/
+|   +-- src/
 
-│   │   ├── components/
+|   |   +-- components/
 
-│   │   ├── context/
+|   |   +-- context/
 
-│   │   ├── pages/
+|   |   +-- pages/
 
-│   │   ├── api/
+|   |   +-- api/
 
-│   │   └── ...
+|   |   +-- ...
 
-│   ├── .env.production
+|   |
 
-│   └── package.json
+|   +-- .env.production
 
-│
+|   +-- package.json
 
-├── server/
+|
 
-│   ├── src/
++-- server/
 
-│   │   ├── config/
+|   +-- src/
 
-│   │   ├── controllers/
+|   |   +-- config/
 
-│   │   ├── middleware/
+|   |   +-- controllers/
 
-│   │   ├── routes/
+|   |   +-- middleware/
 
-│   │   └── ...
+|   |   +-- routes/
 
-│   ├── prisma/
+|   |   +-- ...
 
-│   ├── .env
+|   |
 
-│   └── package.json
+|   +-- prisma/
 
-│
+|   +-- .env
 
-├── .gitignore
+|   +-- package.json
 
-├── README.md
+|
 
-└── ...
++-- .gitignore
+
++-- README.md
 
 ```
 
@@ -899,10 +811,6 @@ Project Hub/
 
 
 \### Prerequisites
-
-
-
-Make sure the following are installed:
 
 
 
@@ -934,7 +842,7 @@ cd Project-Hub
 
 
 
-Install frontend dependencies:
+Frontend:
 
 
 
@@ -948,7 +856,7 @@ npm install
 
 
 
-Install backend dependencies:
+Backend:
 
 
 
@@ -1002,7 +910,7 @@ CLIENT\_URL=http://localhost:5173
 
 
 
-For the frontend, create `.env.local` or configure the appropriate Vite environment file:
+For the frontend:
 
 
 
@@ -1050,10 +958,6 @@ npm run dev
 
 
 
-The development application can then be accessed through the local Vite development server.
-
-
-
 \## 13. Environment Variables
 
 
@@ -1062,23 +966,23 @@ The development application can then be accessed through the local Vite developm
 
 
 
-| Variable         | Purpose                        |
+| Variable       | Purpose                        |
 
-| ---------------- | ------------------------------ |
+| -------------- | ------------------------------ |
 
-| `NODE\_ENV`       | Application environment        |
+| NODE\_ENV       | Application environment        |
 
-| `PORT`           | Express server port            |
+| PORT           | Express server port            |
 
-| `DATABASE\_URL`   | PostgreSQL database connection |
+| DATABASE\_URL   | PostgreSQL database connection |
 
-| `JWT\_SECRET`     | JWT signing secret             |
+| JWT\_SECRET     | JWT signing secret             |
 
-| `JWT\_EXPIRES\_IN` | JWT expiration duration        |
+| JWT\_EXPIRES\_IN | JWT expiration duration        |
 
-| `CSRF\_SECRET`    | CSRF protection secret         |
+| CSRF\_SECRET    | CSRF protection secret         |
 
-| `CLIENT\_URL`     | Frontend origin                |
+| CLIENT\_URL     | Frontend origin                |
 
 
 
@@ -1086,11 +990,11 @@ The development application can then be accessed through the local Vite developm
 
 
 
-| Variable       | Purpose              |
+| Variable     | Purpose              |
 
-| -------------- | -------------------- |
+| ------------ | -------------------- |
 
-| `VITE\_API\_URL` | Backend API base URL |
+| VITE\_API\_URL | Backend API base URL |
 
 
 
@@ -1102,7 +1006,7 @@ Production secrets are configured directly on the deployment environment and are
 
 
 
-Screenshots of the application can be added here to demonstrate the main user-facing functionality.
+Screenshots of the application can be added here.
 
 
 
@@ -1134,7 +1038,7 @@ Screenshots of the application can be added here to demonstrate the main user-fa
 
 
 
-\*Add project/task screenshot here.\*
+\*Add project and task screenshot here.\*
 
 
 
@@ -1154,7 +1058,7 @@ Potential future improvements include:
 
 \* CloudFront/S3-based frontend hosting
 
-\* AWS CloudWatch monitoring and alerting
+\* CloudWatch monitoring and alerting
 
 \* Advanced project analytics
 
@@ -1190,7 +1094,7 @@ Project Hub demonstrates practical experience across the full application lifecy
 
 \* Production deployment
 
-\* Reverse proxy configuration
+\* Nginx reverse proxy configuration
 
 \* HTTPS configuration
 
