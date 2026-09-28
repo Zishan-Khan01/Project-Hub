@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -27,6 +28,11 @@ import {
 const app = express();
 
 app.set("trust proxy", "loopback");
+
+const frontendPath = path.resolve(
+  process.cwd(),
+  "../client/dist"
+);
 
 app.use(securityHeaders);
 
@@ -105,6 +111,16 @@ app.use(
   doubleCsrfProtection,
   commentRoutes
 );
+
+// Serve React frontend
+app.use(express.static(frontendPath));
+
+// React Router fallback
+app.get(/^(?!\/api).*/, (_req, res) => {
+  res.sendFile(
+    path.join(frontendPath, "index.html")
+  );
+});
 
 // 404
 app.use(notFound);
