@@ -1,30 +1,552 @@
-\# Project Hub
-
-
+# Project Hub
 
 A multi-tenant project management and ticket management platform inspired by tools like Jira and Asana.
 
+Project Hub allows organizations to manage teams, projects, tasks, comments, and user access through role-based permissions.
 
-
-\## 1. Overview
-
-
+## 1. Overview
 
 Project Hub is a full-stack project management platform built around a multi-tenant architecture.
 
-
-
 Users belong to organizations, and access to protected resources is isolated by organization.
-
-
 
 The platform provides:
 
+- Organization-based multi-tenancy
+- Team and project management
+- Task and ticket management
+- Kanban-style task workflow
+- Role-based access control
+- JWT authentication
+- HTTP-only authentication cookies
+- CSRF protection
+- Request validation
+- Rate limiting
+- PostgreSQL persistence
+- AWS production deployment
 
+## 2. Features
 
-\- Organization-based multi-tenancy
+### Authentication
 
-\- Team and project management
+- User registration and login
+- JWT-based authentication
+- HTTP-only authentication cookies
+- Secure production cookies
+- Logout functionality
+- CSRF protection
 
-\- Task and ticket management
+### Organization & Multi-Tenancy
 
+- Organization-based user isolation
+- Teams and projects associated with organizations
+- Protected resources enforce tenant isolation
+
+### Role-Based Access Control
+
+Supported roles:
+
+- Admin
+- Project Manager
+- Developer
+
+Authorization is enforced on the backend.
+
+### Teams
+
+- Create and manage teams
+- Add and remove team members
+- Associate teams with organizations
+
+### Projects
+
+- Create and manage projects
+- Assign project members
+- Associate projects with organizations
+
+### Tasks & Tickets
+
+- Create, update, and delete tasks
+- Task priorities
+- Task statuses
+- Task assignments
+- Kanban-style workflow
+- Drag-and-drop task management
+
+Supported task statuses:
+
+- TODO
+- IN_PROGRESS
+- IN_REVIEW
+- DONE
+
+Supported priorities:
+
+- LOW
+- MEDIUM
+- HIGH
+- URGENT
+
+### Comments
+
+- Add comments to tasks
+- Associate comments with users and tasks
+
+### Security
+
+- JWT authentication
+- HTTP-only cookies
+- CSRF protection
+- Role-based authorization
+- Tenant isolation
+- Zod request validation
+- Rate limiting
+- Helmet security headers
+- CORS configuration
+- HTTPS
+- Private RDS database access
+
+## 3. Tech Stack
+
+### Frontend
+
+- React
+- TypeScript
+- React Router
+- Tailwind CSS
+- dnd-kit
+- Vite
+
+### Backend
+
+- Node.js
+- Express
+- TypeScript
+- Zod
+- JWT
+- bcrypt
+- Helmet
+- express-rate-limit
+- cookie-parser
+- CORS
+
+### Database
+
+- PostgreSQL
+- Prisma ORM
+
+### Infrastructure & Deployment
+
+- AWS EC2
+- AWS RDS for PostgreSQL
+- AWS IAM
+- AWS Security Groups
+- Nginx
+- Let's Encrypt
+- systemd
+
+### Development & Version Control
+
+- Git
+- GitHub
+- npm
+
+## 4. System Architecture
+
+```text
+                         Internet
+                             |
+                             v
+                    +-----------------+
+                    |      Nginx      |
+                    |   HTTP -> HTTPS |
+                    |     :80/:443    |
+                    +--------+--------+
+                             |
+                             v
+                    +-----------------+
+                    |   Node.js +     |
+                    |     Express     |
+                    |      :3000      |
+                    +--------+--------+
+                             |
+                             v
+                    +-----------------+
+                    |    AWS RDS      |
+                    |   PostgreSQL    |
+                    |      :5432      |
+                    +-----------------+
+
+AWS EC2
+|
++-- Nginx
++-- Express API
++-- React production build
+```
+
+## 5. Application Architecture
+
+```text
+React Frontend
+      |
+      | HTTPS / REST API
+      v
+Express Backend
+      |
+      +-- Authentication
+      +-- Authorization / RBAC
+      +-- Tenant Isolation
+      +-- Validation
+      +-- CSRF Protection
+      +-- Rate Limiting
+      +-- Business Logic
+             |
+             v
+        Prisma ORM
+             |
+             v
+       PostgreSQL / RDS
+```
+
+## 6. Authentication & Security
+
+Project Hub implements multiple layers of application and infrastructure security.
+
+### Authentication
+
+- JWT-based authentication
+- Authentication tokens stored in HTTP-only cookies
+- Secure cookies enabled in production
+- Configurable token expiration
+
+### Authorization
+
+Role-based access control is implemented for:
+
+- Admin
+- Project Manager
+- Developer
+
+Protected routes verify authentication and permissions before allowing restricted operations.
+
+### CSRF Protection
+
+Protected state-changing requests use CSRF protection through a CSRF token mechanism.
+
+### Tenant Isolation
+
+Users and resources are associated with organizations. Protected backend operations verify organization membership to prevent access to resources belonging to another organization.
+
+### Input Validation
+
+Request data is validated using Zod before being processed by the application.
+
+### Rate Limiting
+
+Rate limiting is applied to API requests, with stricter limits for authentication-related endpoints.
+
+### Security Headers
+
+Helmet is used to provide HTTP security headers.
+
+### Production Security
+
+- HTTPS through Nginx and Let's Encrypt
+- HTTP to HTTPS redirection
+- Express port 3000 is not publicly exposed
+- RDS PostgreSQL is not publicly accessible
+- EC2 Security Groups restrict network access
+- Secrets are stored in environment variables
+
+## 7. Database Design
+
+Project Hub uses PostgreSQL with Prisma for relational data management.
+
+The core entity hierarchy is:
+
+```text
+Organization
+    |
+    +-- Users
+    |
+    +-- Teams
+    |     |
+    |     +-- Team Members
+    |
+    +-- Projects
+          |
+          +-- Project Members
+          |
+          +-- Tasks
+                |
+                +-- Comments
+```
+
+Core entities include:
+
+- Organization
+- User
+- Team
+- TeamMember
+- Project
+- ProjectMember
+- Task
+- Comment
+- AuditLog
+
+Many-to-many relationships such as team membership and project membership are represented through dedicated relation tables.
+
+## 8. User Roles & Permissions
+
+Project Hub supports three user roles:
+
+| Role | Description |
+|---|---|
+| Admin | Organization-level administrative access |
+| Project Manager | Manages projects and project-related work |
+| Developer | Works on assigned projects and tasks |
+
+Authorization is enforced on the backend through RBAC middleware rather than relying only on frontend restrictions.
+
+## 9. API Structure
+
+The backend exposes REST API endpoints organized by resource:
+
+```text
+/api/auth
+/api/users
+/api/teams
+/api/projects
+/api/tasks
+/api/comments
+```
+
+Authentication endpoints include:
+
+```text
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/logout
+GET  /api/auth/csrf-token
+```
+
+Protected resources require authentication and tenant authorization.
+
+The API uses standard HTTP methods and JSON responses.
+
+## 10. AWS Deployment
+
+The application is deployed on AWS using a minimal production architecture.
+
+### AWS Components
+
+- EC2 hosts Nginx, the Express backend, and the React production build.
+- RDS PostgreSQL provides managed relational database storage.
+- Security Groups control network access.
+- IAM provides AWS identity and access management.
+
+### Reverse Proxy
+
+```text
+Internet
+   |
+   v
+Nginx :443
+   |
+   v
+Express :3000
+   |
+   v
+RDS PostgreSQL :5432
+```
+
+### HTTPS
+
+HTTPS is provided through Let's Encrypt.
+
+HTTP requests are redirected to HTTPS, and certificate renewal is automated through a systemd timer.
+
+### Backend Process Management
+
+The Express application runs as a systemd service, allowing the backend to start automatically and restart if necessary.
+
+## 11. Project Structure
+
+```text
+Project Hub/
+|
++-- client/
+|   +-- src/
+|   |   +-- components/
+|   |   +-- context/
+|   |   +-- pages/
+|   |   +-- api/
+|   |   +-- ...
+|   |
+|   +-- .env.production
+|   +-- package.json
+|
++-- server/
+|   +-- src/
+|   |   +-- config/
+|   |   +-- controllers/
+|   |   +-- middleware/
+|   |   +-- routes/
+|   |   +-- ...
+|   |
+|   +-- prisma/
+|   +-- .env
+|   +-- package.json
+|
++-- .gitignore
++-- README.md
+```
+
+## 12. Local Setup
+
+### Prerequisites
+
+- Node.js 22+
+- npm
+- PostgreSQL
+- Git
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/Zishan-Khan01/Project-Hub.git
+cd Project-Hub
+```
+
+### Install Dependencies
+
+Frontend:
+
+```bash
+cd client
+npm install
+```
+
+Backend:
+
+```bash
+cd ../server
+npm install
+```
+
+### Configure Environment Variables
+
+Create a `.env` file inside the `server` directory.
+
+Example:
+
+```env
+NODE_ENV=development
+PORT=3000
+
+DATABASE_URL=your_postgresql_connection_string
+
+JWT_SECRET=your_jwt_secret
+JWT_EXPIRES_IN=7d
+
+CSRF_SECRET=your_csrf_secret
+
+CLIENT_URL=http://localhost:5173
+```
+
+For the frontend:
+
+```env
+VITE_API_URL=http://localhost:3000/api
+```
+
+Never commit actual secrets or production credentials to Git.
+
+### Run the Backend
+
+From the `server` directory:
+
+```bash
+npm run dev
+```
+
+### Run the Frontend
+
+From the `client` directory:
+
+```bash
+npm run dev
+```
+
+## 13. Environment Variables
+
+### Backend
+
+| Variable | Purpose |
+|---|---|
+| NODE_ENV | Application environment |
+| PORT | Express server port |
+| DATABASE_URL | PostgreSQL database connection |
+| JWT_SECRET | JWT signing secret |
+| JWT_EXPIRES_IN | JWT expiration duration |
+| CSRF_SECRET | CSRF protection secret |
+| CLIENT_URL | Frontend origin |
+
+### Frontend
+
+| Variable | Purpose |
+|---|---|
+| VITE_API_URL | Backend API base URL |
+
+Production secrets are configured directly on the deployment environment and are not stored in the repository.
+
+## 14. Screenshots
+
+Screenshots of the application can be added here.
+
+### Login
+
+_Add login screenshot here._
+
+### Dashboard
+
+_Add dashboard screenshot here._
+
+### Kanban Board
+
+_Add Kanban board screenshot here._
+
+### Project & Tasks
+
+_Add project and task screenshot here._
+
+## 15. Future Improvements
+
+Potential future improvements include:
+
+- Automated test coverage
+- CI/CD pipeline
+- Custom domain
+- CloudFront/S3-based frontend hosting
+- CloudWatch monitoring and alerting
+- Advanced project analytics
+- Additional notification features
+- More granular permissions
+- Enhanced production security policies
+
+## 16. Project Highlights
+
+Project Hub demonstrates practical experience across the full application lifecycle:
+
+- Full-stack TypeScript development
+- REST API development
+- Relational database design
+- Authentication and authorization
+- Multi-tenant architecture
+- Application security
+- AWS infrastructure
+- Production deployment
+- Nginx reverse proxy configuration
+- HTTPS configuration
+- Process management with systemd
+- Git and GitHub workflow
