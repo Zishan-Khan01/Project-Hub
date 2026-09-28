@@ -26,6 +26,8 @@ import {
 
 const app = express();
 
+app.set("trust proxy", "loopback");
+
 app.use(securityHeaders);
 
 app.use(
