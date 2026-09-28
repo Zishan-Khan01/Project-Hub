@@ -1,523 +1,3 @@
-\# Project Hub
-
-
-
-A multi-tenant project management and ticket management platform inspired by tools like Jira and Asana.
-
-
-
-Project Hub allows organizations to manage teams, projects, tasks, comments, and user access through role-based permissions.
-
-
-
-\## 1. Overview
-
-
-
-Project Hub is a full-stack project management platform built around a multi-tenant architecture.
-
-
-
-Users belong to organizations, and access to protected resources is isolated by organization.
-
-
-
-The platform provides:
-
-
-
-\* Organization-based multi-tenancy
-
-\* Team and project management
-
-\* Task and ticket management
-
-\* Kanban-style task workflow
-
-\* Role-based access control
-
-\* JWT authentication
-
-\* HTTP-only authentication cookies
-
-\* CSRF protection
-
-\* Request validation
-
-\* Rate limiting
-
-\* PostgreSQL persistence
-
-\* AWS production deployment
-
-
-
-\## 2. Features
-
-
-
-\### Authentication
-
-
-
-\* User registration and login
-
-\* JWT-based authentication
-
-\* HTTP-only authentication cookies
-
-\* Secure production cookies
-
-\* Logout functionality
-
-\* CSRF protection
-
-
-
-\### Organization \& Multi-Tenancy
-
-
-
-\* Organization-based user isolation
-
-\* Teams and projects associated with organizations
-
-\* Protected resources enforce tenant isolation
-
-
-
-\### Role-Based Access Control
-
-
-
-Supported roles:
-
-
-
-\* Admin
-
-\* Project Manager
-
-\* Developer
-
-
-
-Authorization is enforced on the backend.
-
-
-
-\### Teams
-
-
-
-\* Create and manage teams
-
-\* Add and remove team members
-
-\* Associate teams with organizations
-
-
-
-\### Projects
-
-
-
-\* Create and manage projects
-
-\* Assign project members
-
-\* Associate projects with organizations
-
-
-
-\### Tasks \& Tickets
-
-
-
-\* Create, update, and delete tasks
-
-\* Task priorities
-
-\* Task statuses
-
-\* Task assignments
-
-\* Kanban-style workflow
-
-\* Drag-and-drop task management
-
-
-
-Supported task statuses:
-
-
-
-\* TODO
-
-\* IN\_PROGRESS
-
-\* IN\_REVIEW
-
-\* DONE
-
-
-
-Supported priorities:
-
-
-
-\* LOW
-
-\* MEDIUM
-
-\* HIGH
-
-\* URGENT
-
-
-
-\### Comments
-
-
-
-\* Add comments to tasks
-
-\* Associate comments with users and tasks
-
-
-
-\### Security
-
-
-
-\* JWT authentication
-
-\* HTTP-only cookies
-
-\* CSRF protection
-
-\* Role-based authorization
-
-\* Tenant isolation
-
-\* Zod request validation
-
-\* Rate limiting
-
-\* Helmet security headers
-
-\* CORS configuration
-
-\* HTTPS
-
-\* Private RDS database access
-
-
-
-\## 3. Tech Stack
-
-
-
-\### Frontend
-
-
-
-\* React
-
-\* TypeScript
-
-\* React Router
-
-\* Tailwind CSS
-
-\* dnd-kit
-
-\* Vite
-
-
-
-\### Backend
-
-
-
-\* Node.js
-
-\* Express
-
-\* TypeScript
-
-\* Zod
-
-\* JWT
-
-\* bcrypt
-
-\* Helmet
-
-\* express-rate-limit
-
-\* cookie-parser
-
-\* CORS
-
-
-
-\### Database
-
-
-
-\* PostgreSQL
-
-\* Prisma ORM
-
-
-
-\### Infrastructure \& Deployment
-
-
-
-\* AWS EC2
-
-\* AWS RDS for PostgreSQL
-
-\* AWS IAM
-
-\* AWS Security Groups
-
-\* Nginx
-
-\* Let's Encrypt
-
-\* systemd
-
-
-
-\### Development \& Version Control
-
-
-
-\* Git
-
-\* GitHub
-
-\* npm
-
-
-
-\## 4. System Architecture
-
-
-
-```text
-
-&#x20;                        Internet
-
-&#x20;                            |
-
-&#x20;                            v
-
-&#x20;                   +-----------------+
-
-&#x20;                   |      Nginx      |
-
-&#x20;                   |   HTTP -> HTTPS |
-
-&#x20;                   |     :80/:443    |
-
-&#x20;                   +--------+--------+
-
-&#x20;                            |
-
-&#x20;                            v
-
-&#x20;                   +-----------------+
-
-&#x20;                   |   Node.js +     |
-
-&#x20;                   |     Express     |
-
-&#x20;                   |      :3000      |
-
-&#x20;                   +--------+--------+
-
-&#x20;                            |
-
-&#x20;                            v
-
-&#x20;                   +-----------------+
-
-&#x20;                   |    AWS RDS      |
-
-&#x20;                   |   PostgreSQL    |
-
-&#x20;                   |      :5432      |
-
-&#x20;                   +-----------------+
-
-
-
-AWS EC2
-
-|
-
-+-- Nginx
-
-+-- Express API
-
-+-- React production build
-
-```
-
-
-
-\## 5. Application Architecture
-
-
-
-```text
-
-React Frontend
-
-&#x20;     |
-
-&#x20;     | HTTPS / REST API
-
-&#x20;     v
-
-Express Backend
-
-&#x20;     |
-
-&#x20;     +-- Authentication
-
-&#x20;     +-- Authorization / RBAC
-
-&#x20;     +-- Tenant Isolation
-
-&#x20;     +-- Validation
-
-&#x20;     +-- CSRF Protection
-
-&#x20;     +-- Rate Limiting
-
-&#x20;     +-- Business Logic
-
-&#x20;            |
-
-&#x20;            v
-
-&#x20;       Prisma ORM
-
-&#x20;            |
-
-&#x20;            v
-
-&#x20;      PostgreSQL / RDS
-
-```
-
-
-
-\## 6. Authentication \& Security
-
-
-
-Project Hub implements multiple layers of application and infrastructure security.
-
-
-
-\### Authentication
-
-
-
-\* JWT-based authentication
-
-\* Authentication tokens stored in HTTP-only cookies
-
-\* Secure cookies enabled in production
-
-\* Configurable token expiration
-
-
-
-\### Authorization
-
-
-
-Role-based access control is implemented for:
-
-
-
-\* Admin
-
-\* Project Manager
-
-\* Developer
-
-
-
-Protected routes verify authentication and permissions before allowing restricted operations.
-
-
-
-\### CSRF Protection
-
-
-
-Protected state-changing requests use CSRF protection through a CSRF token mechanism.
-
-
-
-\### Tenant Isolation
-
-
-
-Users and resources are associated with organizations. Protected backend operations verify organization membership to prevent access to resources belonging to another organization.
-
-
-
-\### Input Validation
-
-
-
-Request data is validated using Zod before being processed by the application.
-
-
-
-\### Rate Limiting
-
-
-
-Rate limiting is applied to API requests, with stricter limits for authentication-related endpoints.
-
-
-
-\### Security Headers
-
-
-
-Helmet is used to provide HTTP security headers.
-
-
-
-\### Production Security
-
-
-
-\* HTTPS through Nginx and Let's Encrypt
-
-\* HTTP to HTTPS redirection
-
-\* Express port 3000 is not publicly exposed
-
-\* RDS PostgreSQL is not publicly accessible
-
-\* EC2 Security Groups restrict network access
-
-\* Secrets are stored in environment variables
-
-
-
 \## 7. Database Design
 
 
@@ -534,59 +14,59 @@ The core entity hierarchy is:
 
 Organization
 
-&#x20;   |
+&#x20;   │
 
-&#x20;   +-- Users
+&#x20;   ├── Users
 
-&#x20;   |
+&#x20;   │
 
-&#x20;   +-- Teams
+&#x20;   ├── Teams
 
-&#x20;   |     |
+&#x20;   │      │
 
-&#x20;   |     +-- Team Members
+&#x20;   │      └── Team Members
 
-&#x20;   |
+&#x20;   │
 
-&#x20;   +-- Projects
+&#x20;   └── Projects
 
-&#x20;         |
+&#x20;          │
 
-&#x20;         +-- Project Members
+&#x20;          ├── Project Members
 
-&#x20;         |
+&#x20;          │
 
-&#x20;         +-- Tasks
+&#x20;          └── Tasks
 
-&#x20;               |
+&#x20;                 │
 
-&#x20;               +-- Comments
+&#x20;                 └── Comments
 
 ```
 
 
 
-Core entities include:
+\### Core Entities
 
 
 
-\* Organization
+\* \*\*Organization\*\* — tenant boundary for application data
 
-\* User
+\* \*\*User\*\* — application users and their roles
 
-\* Team
+\* \*\*Team\*\* — groups of users within an organization
 
-\* TeamMember
+\* \*\*TeamMember\*\* — team membership relationship
 
-\* Project
+\* \*\*Project\*\* — projects belonging to an organization
 
-\* ProjectMember
+\* \*\*ProjectMember\*\* — project membership relationship
 
-\* Task
+\* \*\*Task\*\* — project work items/tickets
 
-\* Comment
+\* \*\*Comment\*\* — task-related discussions
 
-\* AuditLog
+\* \*\*AuditLog\*\* — records important application actions
 
 
 
@@ -598,23 +78,27 @@ Many-to-many relationships such as team membership and project membership are re
 
 
 
-Project Hub supports three user roles:
+Project Hub currently supports three user roles:
 
 
 
-| Role            | Description                               |
+| Role                | Description                               |
 
-| --------------- | ----------------------------------------- |
+| ------------------- | ----------------------------------------- |
 
-| Admin           | Organization-level administrative access  |
+| \*\*Admin\*\*           | Organization-level administrative access  |
 
-| Project Manager | Manages projects and project-related work |
+| \*\*Project Manager\*\* | Manages projects and project-related work |
 
-| Developer       | Works on assigned projects and tasks      |
+| \*\*Developer\*\*       | Works on assigned projects and tasks      |
 
 
 
 Authorization is enforced on the backend through RBAC middleware rather than relying only on frontend restrictions.
+
+
+
+This ensures that restricted operations cannot be accessed simply by bypassing the frontend.
 
 
 
@@ -644,33 +128,107 @@ The backend exposes REST API endpoints organized by resource:
 
 
 
-Authentication endpoints include:
+\### Authentication
 
 
 
 ```text
 
-POST /api/auth/register
+POST   /api/auth/register
 
-POST /api/auth/login
+POST   /api/auth/login
 
-POST /api/auth/logout
+POST   /api/auth/logout
 
-GET  /api/auth/csrf-token
+GET    /api/auth/csrf-token
 
 ```
 
 
 
-Protected resources require authentication and tenant authorization.
+\### Users
 
 
 
-The API uses standard HTTP methods and JSON responses.
+```text
+
+GET    /api/users
+
+...
+
+```
 
 
 
-\## 10. AWS Deployment
+\### Teams
+
+
+
+```text
+
+GET    /api/teams
+
+POST   /api/teams
+
+...
+
+```
+
+
+
+\### Projects
+
+
+
+```text
+
+GET    /api/projects
+
+POST   /api/projects
+
+...
+
+```
+
+
+
+\### Tasks
+
+
+
+```text
+
+GET    /api/tasks
+
+POST   /api/tasks
+
+...
+
+```
+
+
+
+\### Comments
+
+
+
+```text
+
+GET    /api/comments
+
+POST   /api/comments
+
+...
+
+```
+
+
+
+The API uses standard HTTP methods and JSON responses. Protected resources require authentication and tenant authorization.
+
+
+
+\## 10. Deployment
 
 
 
@@ -682,13 +240,13 @@ The application is deployed on AWS using a minimal production architecture.
 
 
 
-\* EC2 hosts Nginx, the Express backend, and the React production build.
+\* \*\*EC2\*\* — hosts Nginx, the Express backend, and the React production build
 
-\* RDS PostgreSQL provides managed relational database storage.
+\* \*\*RDS PostgreSQL\*\* — managed relational database
 
-\* Security Groups control network access.
+\* \*\*Security Groups\*\* — control inbound and database access
 
-\* IAM provides AWS identity and access management.
+\* \*\*IAM\*\* — AWS identity and access management
 
 
 
@@ -696,29 +254,37 @@ The application is deployed on AWS using a minimal production architecture.
 
 
 
+Nginx sits in front of the Express server:
+
+
+
 ```text
 
 Internet
 
-&#x20;  |
+&#x20;  │
 
-&#x20;  v
+&#x20;  ▼
 
 Nginx :443
 
-&#x20;  |
+&#x20;  │
 
-&#x20;  v
+&#x20;  ▼
 
 Express :3000
 
-&#x20;  |
+&#x20;  │
 
-&#x20;  v
+&#x20;  ▼
 
 RDS PostgreSQL :5432
 
 ```
+
+
+
+Express listens on the internal EC2 port while Nginx handles public HTTP/HTTPS traffic.
 
 
 
@@ -750,357 +316,57 @@ The Express application runs as a systemd service, allowing the backend to start
 
 Project Hub/
 
-|
+│
 
-+-- client/
+├── client/
 
-|   +-- src/
+│   ├── src/
 
-|   |   +-- components/
+│   │   ├── components/
 
-|   |   +-- context/
+│   │   ├── context/
 
-|   |   +-- pages/
+│   │   ├── pages/
 
-|   |   +-- api/
+│   │   ├── api/
 
-|   |   +-- ...
+│   │   └── ...
 
-|   |
+│   ├── .env.production
 
-|   +-- .env.production
+│   └── package.json
 
-|   +-- package.json
+│
 
-|
+├── server/
 
-+-- server/
+│   ├── src/
 
-|   +-- src/
+│   │   ├── config/
 
-|   |   +-- config/
+│   │   ├── controllers/
 
-|   |   +-- controllers/
+│   │   ├── middleware/
 
-|   |   +-- middleware/
+│   │   ├── routes/
 
-|   |   +-- routes/
+│   │   └── ...
 
-|   |   +-- ...
+│   ├── prisma/
 
-|   |
+│   ├── .env
 
-|   +-- prisma/
+│   └── package.json
 
-|   +-- .env
+│
 
-|   +-- package.json
+├── .gitignore
 
-|
+├── README.md
 
-+-- .gitignore
-
-+-- README.md
+└── ...
 
 ```
-
-
-
-\## 12. Local Setup
-
-
-
-\### Prerequisites
-
-
-
-\* Node.js 22+
-
-\* npm
-
-\* PostgreSQL
-
-\* Git
-
-
-
-\### Clone the Repository
-
-
-
-```bash
-
-git clone https://github.com/Zishan-Khan01/Project-Hub.git
-
-cd Project-Hub
-
-```
-
-
-
-\### Install Dependencies
-
-
-
-Frontend:
-
-
-
-```bash
-
-cd client
-
-npm install
-
-```
-
-
-
-Backend:
-
-
-
-```bash
-
-cd ../server
-
-npm install
-
-```
-
-
-
-\### Configure Environment Variables
-
-
-
-Create a `.env` file inside the `server` directory.
-
-
-
-Example:
-
-
-
-```env
-
-NODE\_ENV=development
-
-PORT=3000
-
-
-
-DATABASE\_URL=your\_postgresql\_connection\_string
-
-
-
-JWT\_SECRET=your\_jwt\_secret
-
-JWT\_EXPIRES\_IN=7d
-
-
-
-CSRF\_SECRET=your\_csrf\_secret
-
-
-
-CLIENT\_URL=http://localhost:5173
-
-```
-
-
-
-For the frontend:
-
-
-
-```env
-
-VITE\_API\_URL=http://localhost:3000/api
-
-```
-
-
-
-Never commit actual secrets or production credentials to Git.
-
-
-
-\### Run the Backend
-
-
-
-From the `server` directory:
-
-
-
-```bash
-
-npm run dev
-
-```
-
-
-
-\### Run the Frontend
-
-
-
-From the `client` directory:
-
-
-
-```bash
-
-npm run dev
-
-```
-
-
-
-\## 13. Environment Variables
-
-
-
-\### Backend
-
-
-
-| Variable       | Purpose                        |
-
-| -------------- | ------------------------------ |
-
-| NODE\_ENV       | Application environment        |
-
-| PORT           | Express server port            |
-
-| DATABASE\_URL   | PostgreSQL database connection |
-
-| JWT\_SECRET     | JWT signing secret             |
-
-| JWT\_EXPIRES\_IN | JWT expiration duration        |
-
-| CSRF\_SECRET    | CSRF protection secret         |
-
-| CLIENT\_URL     | Frontend origin                |
-
-
-
-\### Frontend
-
-
-
-| Variable     | Purpose              |
-
-| ------------ | -------------------- |
-
-| VITE\_API\_URL | Backend API base URL |
-
-
-
-Production secrets are configured directly on the deployment environment and are not stored in the repository.
-
-
-
-\## 14. Screenshots
-
-
-
-Screenshots of the application can be added here.
-
-
-
-\### Login
-
-
-
-\*Add login screenshot here.\*
-
-
-
-\### Dashboard
-
-
-
-\*Add dashboard screenshot here.\*
-
-
-
-\### Kanban Board
-
-
-
-\*Add Kanban board screenshot here.\*
-
-
-
-\### Project \& Tasks
-
-
-
-\*Add project and task screenshot here.\*
-
-
-
-\## 15. Future Improvements
-
-
-
-Potential future improvements include:
-
-
-
-\* Automated test coverage
-
-\* CI/CD pipeline
-
-\* Custom domain
-
-\* CloudFront/S3-based frontend hosting
-
-\* CloudWatch monitoring and alerting
-
-\* Advanced project analytics
-
-\* Additional notification features
-
-\* More granular permissions
-
-\* Enhanced production security policies
-
-
-
-\## 16. Project Highlights
-
-
-
-Project Hub demonstrates practical experience across the full application lifecycle:
-
-
-
-\* Full-stack TypeScript development
-
-\* REST API development
-
-\* Relational database design
-
-\* Authentication and authorization
-
-\* Multi-tenant architecture
-
-\* Application security
-
-\* AWS infrastructure
-
-\* Production deployment
-
-\* Nginx reverse proxy configuration
-
-\* HTTPS configuration
-
-\* Process management with systemd
-
-\* Git and GitHub workflow
 
 
 
